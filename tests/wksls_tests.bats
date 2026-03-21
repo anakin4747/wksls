@@ -228,6 +228,14 @@ teardown() {
     lsts_completion "fixtures/hover.wks" 0 0 "fixtures/completion.rpc.json"
 }
 
+@test "completion after --fstype= returns fstype values" {
+    lsts_completion "fixtures/completion.wks" 0 10 "fixtures/completion_--fstype.rpc.json"
+}
+
+@test "completion after --ptable= returns ptable values" {
+    lsts_completion "fixtures/completion.wks" 1 10 "fixtures/completion_--ptable.rpc.json"
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"

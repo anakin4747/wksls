@@ -30,23 +30,39 @@ recv() {
     IFS= read -r -N "$content_length" BODY
 }
 
+# Extract the full whitespace-delimited token containing the given character
+# position, and the partial word up to (and including) that character.
+# Sets TOKEN and WORD in the caller's scope.
+_token_at() {
+    local text="$1" line="$2" character="$3"
+    local line_text
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    local before="${line_text:0:$((character + 1))}"
+    WORD="${before##*[$'\t ']}"
+    local after="${line_text:${#before}}"
+    local rest="${after%%[$'\t ']*}"
+    TOKEN="${WORD}${rest}"
+}
+
 # Return the word at the given line and character in the given text.
 # The word is the run of non-whitespace characters that contains the given
 # character position. Any trailing =value suffix is stripped so that
 # --fstype=ext4 returns --fstype.
 word_at() {
-    local text="$1" line="$2" character="$3"
-    local line_text
-    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
-    # Extract the word (run of non-whitespace) that contains the character.
-    local before="${line_text:0:$((character + 1))}"
-    local word
-    word="${before##*[$'\t ']}"
-    local after="${line_text:${#before}}"
-    local rest="${after%%[$'\t ']*}"
-    local token="${word}${rest}"
-    # Strip any =value suffix (e.g. --fstype=ext4 -> --fstype).
-    printf '%s' "${token%%=*}"
+    local TOKEN WORD
+    _token_at "$1" "$2" "$3"
+    printf '%s' "${TOKEN%%=*}"
+}
+
+# If the cursor is positioned in the value part of a flag=value token, return
+# the flag name (e.g. --fstype=ext4 with cursor on ext4 returns --fstype).
+# Returns empty string if the cursor is not in a value position.
+flag_at() {
+    local TOKEN WORD
+    _token_at "$1" "$2" "$3"
+    [[ "$TOKEN" != *=* ]] && return 0
+    [[ "$WORD"  != *=* ]] && return 0
+    printf '%s' "${TOKEN%%=*}"
 }
 
 # Send a hover response with a markdown value.
@@ -57,45 +73,72 @@ send_hover() {
     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
 }
 
-# Send a completion response listing all keywords and flags.
+# Send a completion response. With no argument, returns all keywords and flags.
+# With a flag name argument, returns the enumerable values for that flag, or
+# falls back to the full list if the flag has no fixed value set.
 send_completion() {
-    local id="$1"
+    local id="$1" flag="${2:-}"
     local jq_prog items
-    jq_prog='[
-        {label:"bootloader",  kind:14},
-        {label:"part",        kind:14},
-        {label:"partition",   kind:14},
-        {label:"--active",              kind:5},
-        {label:"--align",               kind:5},
-        {label:"--append",              kind:5},
-        {label:"--configfile",          kind:5},
-        {label:"--exclude-path",        kind:5},
-        {label:"--extra-filesystem-space", kind:5},
-        {label:"--extra-partition-space",  kind:5},
-        {label:"--fixed-size",          kind:5},
-        {label:"--fsoptions",           kind:5},
-        {label:"--fstype",              kind:5},
-        {label:"--fsuuid",              kind:5},
-        {label:"--label",               kind:5},
-        {label:"--mkfs-extraopts",      kind:5},
-        {label:"--no-table",            kind:5},
-        {label:"--offset",              kind:5},
-        {label:"--ondisk",              kind:5},
-        {label:"--ondrive",             kind:5},
-        {label:"--overhead-factor",     kind:5},
-        {label:"--part-name",           kind:5},
-        {label:"--part-type",           kind:5},
-        {label:"--ptable",              kind:5},
-        {label:"--rootfs",              kind:5},
-        {label:"--rootfs-dir",          kind:5},
-        {label:"--size",                kind:5},
-        {label:"--source",              kind:5},
-        {label:"--sourceparams",        kind:5},
-        {label:"--system-id",           kind:5},
-        {label:"--timeout",             kind:5},
-        {label:"--use-uuid",            kind:5},
-        {label:"--uuid",                kind:5}
-    ]'
+
+    case "$flag" in
+        --fstype)
+            jq_prog='[
+                {label:"btrfs",    kind:12},
+                {label:"efi",      kind:12},
+                {label:"erofs",    kind:12},
+                {label:"ext2",     kind:12},
+                {label:"ext3",     kind:12},
+                {label:"ext4",     kind:12},
+                {label:"msdos",    kind:12},
+                {label:"squashfs", kind:12},
+                {label:"swap",     kind:12},
+                {label:"vfat",     kind:12}
+            ]'
+            ;;
+        --ptable)
+            jq_prog='[
+                {label:"gpt",   kind:12},
+                {label:"msdos", kind:12}
+            ]'
+            ;;
+        *)
+            jq_prog='[
+                {label:"bootloader",  kind:14},
+                {label:"part",        kind:14},
+                {label:"partition",   kind:14},
+                {label:"--active",              kind:5},
+                {label:"--align",               kind:5},
+                {label:"--append",              kind:5},
+                {label:"--configfile",          kind:5},
+                {label:"--exclude-path",        kind:5},
+                {label:"--extra-filesystem-space", kind:5},
+                {label:"--extra-partition-space",  kind:5},
+                {label:"--fixed-size",          kind:5},
+                {label:"--fsoptions",           kind:5},
+                {label:"--fstype",              kind:5},
+                {label:"--fsuuid",              kind:5},
+                {label:"--label",               kind:5},
+                {label:"--mkfs-extraopts",      kind:5},
+                {label:"--no-table",            kind:5},
+                {label:"--offset",              kind:5},
+                {label:"--ondisk",              kind:5},
+                {label:"--ondrive",             kind:5},
+                {label:"--overhead-factor",     kind:5},
+                {label:"--part-name",           kind:5},
+                {label:"--part-type",           kind:5},
+                {label:"--ptable",              kind:5},
+                {label:"--rootfs",              kind:5},
+                {label:"--rootfs-dir",          kind:5},
+                {label:"--size",                kind:5},
+                {label:"--source",              kind:5},
+                {label:"--sourceparams",        kind:5},
+                {label:"--system-id",           kind:5},
+                {label:"--timeout",             kind:5},
+                {label:"--use-uuid",            kind:5},
+                {label:"--uuid",                kind:5}
+            ]'
+            ;;
+    esac
     items="$(jq -cn "$jq_prog")"
     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":${items}}"
 }
@@ -432,7 +475,12 @@ while recv; do
             DOC_TEXT["$uri"]="$text"
             ;;
         textDocument/completion)
-            send_completion "$id"
+            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
+            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
+            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
+            text="${DOC_TEXT["$uri"]:-}"
+            flag="$(flag_at "$text" "$line" "$character")"
+            send_completion "$id" "$flag"
             ;;
         textDocument/hover)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
