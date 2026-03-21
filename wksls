@@ -36,10 +36,9 @@ word_at() {
     # Extract the word (run of non-whitespace) that contains the character.
     local before="${line_text:0:$((character + 1))}"
     local word
-    word="${before##* }"
-    word="${word##$'\t'}"
+    word="${before##*[$'\t ']}"
     local after="${line_text:${#before}}"
-    local rest="${after%%[ $'\t']*}"
+    local rest="${after%%[$'\t ']*}"
     printf '%s%s' "$word" "$rest"
 }
 
