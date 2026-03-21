@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## Source plugin: `bootimg_partition`\n\nCreates a boot partition by copying files listed in the `IMAGE_BOOT_FILES` BitBake variable.\n\nCommon usage:\n\n```\npart /boot --source bootimg_partition --ondisk sda --fstype=vfat --label boot --active --align 1024\n```"}}}

@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## Source plugin: `bootimg_pcbios`\n\nCreates a legacy BIOS boot partition (MBR/MSDOS partition table) and installs a bootloader. Supports syslinux (default) and GRUB.\n\nCommon usage:\n\n```\npart /boot --source bootimg_pcbios --ondisk sda --label boot --active --align 1024\n```"}}}

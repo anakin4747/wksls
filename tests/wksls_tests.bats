@@ -250,6 +250,60 @@ teardown() {
         "fixtures/hover_--ptable.rpc.json"
 }
 
+@test "hover over --source rootfs value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 0 16 \
+        "fixtures/hover_source_rootfs.rpc.json"
+}
+
+@test "hover over --source bootimg_efi value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 1 16 \
+        "fixtures/hover_source_bootimg_efi.rpc.json"
+}
+
+@test "hover over --source bootimg_partition value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 2 16 \
+        "fixtures/hover_source_bootimg_partition.rpc.json"
+}
+
+@test "hover over --source bootimg_pcbios value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 3 16 \
+        "fixtures/hover_source_bootimg_pcbios.rpc.json"
+}
+
+@test "hover over --source bootimg_biosplusefi value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 4 16 \
+        "fixtures/hover_source_bootimg_biosplusefi.rpc.json"
+}
+
+@test "hover over --source empty value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 5 16 \
+        "fixtures/hover_source_empty.rpc.json"
+}
+
+@test "hover over --source extra_partition value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 6 16 \
+        "fixtures/hover_source_extra_partition.rpc.json"
+}
+
+@test "hover over --source isoimage_isohybrid value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 7 16 \
+        "fixtures/hover_source_isoimage_isohybrid.rpc.json"
+}
+
+@test "hover over --source rawcopy value returns plugin documentation" {
+    lsts_hover \
+        "fixtures/hover_source_plugins.wks" 8 16 \
+        "fixtures/hover_source_rawcopy.rpc.json"
+}
+
 @test "completion at line start returns only keywords" {
     lsts_completion \
         "fixtures/completion_context.wks" 1 0 \
@@ -314,6 +368,12 @@ teardown() {
     lsts_completion \
         "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 11 \
         "fixtures/completion_part_flags.rpc.json"
+}
+
+@test "completion with partial keyword prefix returns only keywords" {
+    lsts_completion \
+        "fixtures/completion_partial_keyword.wks" 0 2 \
+        "fixtures/completion_keywords.rpc.json"
 }
 
 @test "initialize advertises definitionProvider" {
