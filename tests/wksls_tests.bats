@@ -225,60 +225,51 @@ teardown() {
 }
 
 @test "completion at line start returns only keywords" {
-    lsts_completion "fixtures/completion_context.wks" 1 0 "fixtures/completion_keywords.rpc.json"
+    lsts_completion "fixtures/completion_context.wks" 1 0 \
+        "fixtures/completion_keywords.rpc.json"
 }
 
 @test "completion mid-line returns only flags" {
-    # char 7 is the start of '--source', after the 'part /' keyword+arg
-    lsts_completion "fixtures/completion_context.wks" 0 7 "fixtures/completion_flags.rpc.json"
+    lsts_completion "fixtures/completion_context.wks" 0 7 \
+        "fixtures/completion_flags.rpc.json"
 }
 
 @test "completion after --fstype= returns fstype values" {
-    lsts_completion "fixtures/completion.wks" 0 10 "fixtures/completion_--fstype.rpc.json"
+    lsts_completion "fixtures/completion.wks" 0 10 \
+        "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= returns ptable values" {
-    lsts_completion "fixtures/completion.wks" 1 10 "fixtures/completion_--ptable.rpc.json"
+    lsts_completion "fixtures/completion.wks" 1 10 \
+        "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion after --fstype= with no value typed returns fstype values" {
-    # Cursor lands on the space after '=' (char 32) when editor triggers
-    # completion immediately after typing '--fstype=' before any value.
-    lsts_completion "fixtures/completion_empty_value.wks" 0 32 "fixtures/completion_--fstype.rpc.json"
+    lsts_completion "fixtures/completion_empty_value.wks" 0 32 \
+        "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= with no value typed returns ptable values" {
-    # Cursor lands on the space after '=' (char 20) when editor triggers
-    # completion immediately after typing '--ptable=' before any value.
-    lsts_completion "fixtures/completion_empty_value.wks" 1 20 "fixtures/completion_--ptable.rpc.json"
+    lsts_completion "fixtures/completion_empty_value.wks" 1 20 \
+        "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion at char 0 on non-empty line returns only keywords" {
-    # Line 0 of efi-bootdisk.wks.in is "bootloader --ptable gpt".
-    # Triggering completion at character 0 (on the 'b' of bootloader) must
-    # return keywords, not flags.
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
-        0 0 "fixtures/completion_keywords.rpc.json"
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
+        "fixtures/completion_keywords.rpc.json"
 }
 
 @test "completion after space-separated --ptable returns ptable values" {
-    # Line 0 of efi-bootdisk.wks.in is "bootloader --ptable gpt".
-    # Character 19 is on the 'g' of 'gpt' — the value of --ptable passed
-    # without '='.  The server must offer ptable completions.
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
-        0 19 "fixtures/completion_--ptable.rpc.json"
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 19 \
+        "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion after space-separated --source returns source plugin values" {
-    # Line 1 of efi-bootdisk.wks.in is:
-    #   "part /boot --source rootfs ..."
-    # Character 20 is on the 'o' of 'rootfs' — the value of --source passed
-    # without '='.  The server must offer source plugin completions.
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
-        1 20 "fixtures/completion_--source.rpc.json"
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
+        "fixtures/completion_--source.rpc.json"
 }
 
 @test "fails to start when jq is not installed" {
