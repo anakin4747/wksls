@@ -155,6 +155,10 @@ teardown() {
     lsts_hover "fixtures/hover.wks" 31 0 "fixtures/hover_--rootfs-dir.rpc.json"
 }
 
+@test "hover over --rootfs returns documentation" {
+    lsts_hover "fixtures/hover.wks" 32 0 "fixtures/hover_--rootfs.rpc.json"
+}
+
 @test "hover works when tokens are tab-separated" {
     lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
 }
