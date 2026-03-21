@@ -1,0 +1,2 @@
+part / --source rootfs --fstype= --label boot
+bootloader --ptable= --timeout 0

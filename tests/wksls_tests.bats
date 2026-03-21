@@ -236,6 +236,18 @@ teardown() {
     lsts_completion "fixtures/completion.wks" 1 10 "fixtures/completion_--ptable.rpc.json"
 }
 
+@test "completion after --fstype= with no value typed returns fstype values" {
+    # Cursor lands on the space after '=' (char 32) when editor triggers
+    # completion immediately after typing '--fstype=' before any value.
+    lsts_completion "fixtures/completion_empty_value.wks" 0 32 "fixtures/completion_--fstype.rpc.json"
+}
+
+@test "completion after --ptable= with no value typed returns ptable values" {
+    # Cursor lands on the space after '=' (char 20) when editor triggers
+    # completion immediately after typing '--ptable=' before any value.
+    lsts_completion "fixtures/completion_empty_value.wks" 1 20 "fixtures/completion_--ptable.rpc.json"
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"
