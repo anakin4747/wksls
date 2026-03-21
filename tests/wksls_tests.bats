@@ -150,3 +150,19 @@ teardown() {
 @test "hover works when tokens are tab-separated" {
     lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
 }
+
+@test "fails to start when jq is not installed" {
+    local bash_dir wksls_src
+    bash_dir="$(dirname "$(command -v bash)")"
+    wksls_src="$(dirname "$BATS_TEST_FILENAME")/../wksls"
+    run env -i PATH="$bash_dir" bash "$wksls_src"
+    [[ "$status" -ne 0 ]]
+}
+
+@test "prints error to stderr when jq is not installed" {
+    local bash_dir wksls_src
+    bash_dir="$(dirname "$(command -v bash)")"
+    wksls_src="$(dirname "$BATS_TEST_FILENAME")/../wksls"
+    run env -i PATH="$bash_dir" bash "$wksls_src"
+    [[ "$output" == *"jq"* ]]
+}

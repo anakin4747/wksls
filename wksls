@@ -3,6 +3,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
+command -v jq > /dev/null || { printf 'wksls: jq is required but not found in PATH\n' >&2; exit 1; }
+
 # Send a JSON-RPC message with a Content-Length header on stdout.
 send() {
     local body="$1"
