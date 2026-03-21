@@ -94,6 +94,18 @@ prev_flag_at() {
     printf '%s' "$prev"
 }
 
+# Return the leading directive keyword of the given line (bootloader, part, or
+# partition), or empty string if the line does not start with a known directive.
+directive_at() {
+    local text="$1" line="$2"
+    local line_text first_token
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    first_token="${line_text%%[$'\t ']*}"
+    case "$first_token" in
+        bootloader|part|partition) printf '%s' "$first_token" ;;
+    esac
+}
+
 # Return true if the cursor is at the start of a line, meaning there is no
 # non-whitespace content before it. Used to decide whether to offer keyword
 # completions (bootloader/part/partition) or flag completions.
@@ -192,13 +204,14 @@ send_hover() {
 
 # Send a completion response.
 # context is one of:
-#   "keywords"  — return only directive keywords (bootloader, part, partition)
-#   "flags"     — return only flag names
-#   "--fstype"  — return enumerated fstype values
-#   "--ptable"  — return enumerated ptable values
-#   "--source"  — return known source plugin names
+#   "keywords"          — return only directive keywords (bootloader, part, partition)
+#   "bootloader_flags"  — return only bootloader flag names
+#   "part_flags"        — return only part/partition flag names
+#   "--fstype"          — return enumerated fstype values
+#   "--ptable"          — return enumerated ptable values
+#   "--source"          — return known source plugin names
 send_completion() {
-    local id="$1" context="${2:-flags}"
+    local id="$1" context="${2:-part_flags}"
     local jq_prog items
 
     case "$context" in
@@ -242,39 +255,47 @@ send_completion() {
                 {label:"rootfs",              kind:12}
             ]'
             ;;
-        *)
+        bootloader_flags)
             jq_prog='[
-                {label:"--active",              kind:5},
-                {label:"--align",               kind:5},
-                {label:"--append",              kind:5},
-                {label:"--configfile",          kind:5},
-                {label:"--exclude-path",        kind:5},
+                {label:"--append",     kind:5},
+                {label:"--configfile", kind:5},
+                {label:"--ptable",     kind:5},
+                {label:"--timeout",    kind:5}
+            ]'
+            ;;
+        part_flags)
+            jq_prog='[
+                {label:"--active",                 kind:5},
+                {label:"--align",                  kind:5},
+                {label:"--exclude-path",           kind:5},
                 {label:"--extra-filesystem-space", kind:5},
                 {label:"--extra-partition-space",  kind:5},
-                {label:"--fixed-size",          kind:5},
-                {label:"--fsoptions",           kind:5},
-                {label:"--fstype",              kind:5},
-                {label:"--fsuuid",              kind:5},
-                {label:"--label",               kind:5},
-                {label:"--mkfs-extraopts",      kind:5},
-                {label:"--no-table",            kind:5},
-                {label:"--offset",              kind:5},
-                {label:"--ondisk",              kind:5},
-                {label:"--ondrive",             kind:5},
-                {label:"--overhead-factor",     kind:5},
-                {label:"--part-name",           kind:5},
-                {label:"--part-type",           kind:5},
-                {label:"--ptable",              kind:5},
-                {label:"--rootfs",              kind:5},
-                {label:"--rootfs-dir",          kind:5},
-                {label:"--size",                kind:5},
-                {label:"--source",              kind:5},
-                {label:"--sourceparams",        kind:5},
-                {label:"--system-id",           kind:5},
-                {label:"--timeout",             kind:5},
-                {label:"--use-uuid",            kind:5},
-                {label:"--uuid",                kind:5}
+                {label:"--fixed-size",             kind:5},
+                {label:"--fsoptions",              kind:5},
+                {label:"--fstype",                 kind:5},
+                {label:"--fsuuid",                 kind:5},
+                {label:"--label",                  kind:5},
+                {label:"--mkfs-extraopts",         kind:5},
+                {label:"--no-table",               kind:5},
+                {label:"--offset",                 kind:5},
+                {label:"--ondisk",                 kind:5},
+                {label:"--ondrive",                kind:5},
+                {label:"--overhead-factor",        kind:5},
+                {label:"--part-name",              kind:5},
+                {label:"--part-type",              kind:5},
+                {label:"--rootfs",                 kind:5},
+                {label:"--rootfs-dir",             kind:5},
+                {label:"--size",                   kind:5},
+                {label:"--source",                 kind:5},
+                {label:"--sourceparams",           kind:5},
+                {label:"--system-id",              kind:5},
+                {label:"--use-uuid",               kind:5},
+                {label:"--uuid",                   kind:5}
             ]'
+            ;;
+        *)
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
+            return
             ;;
     esac
     items="$(jq -cn "$jq_prog")"
@@ -626,7 +647,10 @@ while recv; do
             elif line_start_at "$text" "$line" "$character"; then
                 send_completion "$id" "keywords"
             else
-                send_completion "$id" "flags"
+                case "$(directive_at "$text" "$line")" in
+                    bootloader) send_completion "$id" "bootloader_flags" ;;
+                    *)          send_completion "$id" "part_flags" ;;
+                esac
             fi
             ;;
         textDocument/definition)
