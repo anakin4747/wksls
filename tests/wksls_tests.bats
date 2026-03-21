@@ -253,6 +253,34 @@ teardown() {
     lsts_completion "fixtures/completion_empty_value.wks" 1 20 "fixtures/completion_--ptable.rpc.json"
 }
 
+@test "completion at char 0 on non-empty line returns only keywords" {
+    # Line 0 of efi-bootdisk.wks.in is "bootloader --ptable gpt".
+    # Triggering completion at character 0 (on the 'b' of bootloader) must
+    # return keywords, not flags.
+    lsts_completion \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
+        0 0 "fixtures/completion_keywords.rpc.json"
+}
+
+@test "completion after space-separated --ptable returns ptable values" {
+    # Line 0 of efi-bootdisk.wks.in is "bootloader --ptable gpt".
+    # Character 19 is on the 'g' of 'gpt' — the value of --ptable passed
+    # without '='.  The server must offer ptable completions.
+    lsts_completion \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
+        0 19 "fixtures/completion_--ptable.rpc.json"
+}
+
+@test "completion after space-separated --source returns source plugin values" {
+    # Line 1 of efi-bootdisk.wks.in is:
+    #   "part /boot --source rootfs ..."
+    # Character 20 is on the 'o' of 'rootfs' — the value of --source passed
+    # without '='.  The server must offer source plugin completions.
+    lsts_completion \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" \
+        1 20 "fixtures/completion_--source.rpc.json"
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"
