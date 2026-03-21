@@ -25,13 +25,71 @@ recv() {
     IFS= read -r -N "$content_length" BODY
 }
 
+# Return the word at the given line and character in the given text.
+word_at() {
+    local text="$1" line="$2" character="$3"
+    local line_text
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    # Extract the word (run of non-whitespace) that contains the character.
+    local before="${line_text:0:$((character + 1))}"
+    local word
+    word="${before##* }"
+    word="${word##$'\t'}"
+    local after="${line_text:${#before}}"
+    local rest="${after%%[ $'\t']*}"
+    printf '%s%s' "$word" "$rest"
+}
+
+BOOTLOADER_DOC="$(cat <<'HEREDOC'
+## bootloader
+
+This command specifies how the bootloader should be configured and supports the following options:
+
+> **Note:** Bootloader functionality and boot partitions are implemented by the various source plugins that implement bootloader functionality. The bootloader command essentially provides a means of modifying bootloader configuration.
+
+- `--append`: Specifies kernel parameters. These parameters will be added to the syslinux APPEND or `grub` kernel command line.
+
+- `--configfile`: Specifies a user-defined configuration file for the bootloader. You can provide a full pathname for the file or a file located in the `canned-wks` folder. This option overrides all other bootloader options.
+
+- `--ptable`: Specifies the partition table format. Valid values are:
+  - `msdos`
+  - `gpt`
+
+- `--timeout`: Specifies the number of seconds before the bootloader times out and boots the default option.
+HEREDOC
+)"
+
+# Associative array mapping URI -> document text.
+declare -A DOC_TEXT
+
 while recv; do
     method="$(printf '%s' "$BODY" | jq -r '.method // empty')"
     id="$(printf '%s' "$BODY" | jq -r '.id // empty')"
 
     case "$method" in
         initialize)
-            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{}}}"
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true}}}"
+            ;;
+        textDocument/didOpen)
+            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
+            text="$(printf '%s' "$BODY" | jq -r '.params.textDocument.text')"
+            DOC_TEXT["$uri"]="$text"
+            ;;
+        textDocument/hover)
+            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
+            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
+            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
+            text="${DOC_TEXT["$uri"]}"
+            word="$(word_at "$text" "$line" "$character")"
+            case "$word" in
+                bootloader)
+                    value="$(jq -cn --arg v "$BOOTLOADER_DOC" '$v')"
+                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
+                    ;;
+                *)
+                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
+                    ;;
+            esac
             ;;
         exit)
             exit 0
