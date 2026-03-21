@@ -1,11 +1,4 @@
 " Vim syntax file for OpenEmbedded Wic Kickstart (.wks) files
-" Gruvbox colour assignments:
-"   GruvboxYellow  directives (part, bootloader, include)
-"   GruvboxBlue    long options (--flag)
-"   GruvboxGreen   quoted strings and = values
-"   GruvboxOrange  mount points and disk identifiers
-"   GruvboxRed     boolean flags (--active, --use-uuid, --rootfs)
-"   GruvboxGray    comments
 
 if exists("b:current_syntax")
     finish
@@ -48,8 +41,3 @@ syntax match wksDisk /\<\(sda\|sdb\|sdc\|nvme[0-9]n[0-9]\|mmcblk[0-9]\|cd\)\>/
 highlight link wksDisk Number
 
 let b:current_syntax = "wks"
-
-augroup wks_filetype
-    autocmd!
-    autocmd BufRead,BufNewFile *.wks,*.wks.inc? setfiletype wks
-augroup END
