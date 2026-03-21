@@ -72,6 +72,28 @@ flag_at() {
     printf '%s' "${TOKEN%%=*}"
 }
 
+# If the cursor is positioned on the value of a space-separated flag
+# (e.g. '--ptable gpt' with cursor on 'gpt', or '--ptable ' with cursor on
+# the space), return the flag name.  Returns empty string otherwise.
+prev_flag_at() {
+    local text="$1" line="$2" character="$3"
+    local line_text
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    # Include the character at the cursor so a trailing space is visible.
+    local before="${line_text:0:$((character + 1))}"
+    # Strip the last non-whitespace run (partial word at cursor) from before
+    local no_partial
+    no_partial="$(printf '%s' "$before" | sed 's/[^[:space:]]*$//')"
+    # Strip trailing whitespace to land at end of the preceding token
+    local trimmed
+    trimmed="$(printf '%s' "$no_partial" | sed 's/[[:space:]]*$//')"
+    # The preceding token is the last whitespace-delimited word
+    local prev="${trimmed##*[$'\t ']}"
+    # Only return if the preceding token is a flag (starts with --)
+    [[ "$prev" == --* ]] || return 0
+    printf '%s' "$prev"
+}
+
 # Return true if the cursor is at the start of a line, meaning there is no
 # non-whitespace content before it. Used to decide whether to offer keyword
 # completions (bootloader/part/partition) or flag completions.
@@ -79,7 +101,7 @@ line_start_at() {
     local text="$1" line="$2" character="$3"
     local line_text before
     line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
-    before="${line_text:0:$((character + 1))}"
+    before="${line_text:0:${character}}"
     [[ -z "${before//[$'\t ']}" ]]
 }
 
@@ -97,6 +119,7 @@ send_hover() {
 #   "flags"     — return only flag names
 #   "--fstype"  — return enumerated fstype values
 #   "--ptable"  — return enumerated ptable values
+#   "--source"  — return known source plugin names
 send_completion() {
     local id="$1" context="${2:-flags}"
     local jq_prog items
@@ -127,6 +150,19 @@ send_completion() {
             jq_prog='[
                 {label:"gpt",   kind:12},
                 {label:"msdos", kind:12}
+            ]'
+            ;;
+        --source)
+            jq_prog='[
+                {label:"bootimg_biosplusefi", kind:12},
+                {label:"bootimg_efi",         kind:12},
+                {label:"bootimg_partition",   kind:12},
+                {label:"bootimg_pcbios",      kind:12},
+                {label:"empty",               kind:12},
+                {label:"extra_partition",     kind:12},
+                {label:"isoimage_isohybrid",  kind:12},
+                {label:"rawcopy",             kind:12},
+                {label:"rootfs",              kind:12}
             ]'
             ;;
         *)
@@ -505,6 +541,9 @@ while recv; do
             character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
             flag="$(flag_at "$text" "$line" "$character")"
+            if [[ -z "$flag" ]]; then
+                flag="$(prev_flag_at "$text" "$line" "$character")"
+            fi
             if [[ -n "$flag" ]]; then
                 send_completion "$id" "$flag"
             elif line_start_at "$text" "$line" "$character"; then
