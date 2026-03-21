@@ -226,6 +226,10 @@ teardown() {
     lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
 }
 
+@test "completion returns all keywords and flags" {
+    lsts_completion "fixtures/hover.wks" 0 0 "fixtures/completion.rpc.json"
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"
