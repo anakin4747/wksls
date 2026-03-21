@@ -38,60 +38,6 @@ Fix the code accordingly in new commits.
 
 # TODOs
 
-```do right now
-- completion is still completing things in the wrong places
-  the tests for completing only commands at the beginning and only arguments
-  after does not work
-    [DEBUG][2026-03-21 03:59:46] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "rpc.send"      { id = 14, jsonrpc = "2.0", method = "shutdown" }
-    [DEBUG][2026-03-21 03:59:55] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "omnifunc.findstart"    { base = "", findstart = 1 }
-    [DEBUG][2026-03-21 03:59:55] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "LSP[wks]"      "client.request"        2       "textDocument/completion"    {
-     context = { triggerKind = 1 }, position = { character = 0, line = 0 }, textDocument = { uri = "file:///home/kin/src/wksls/tests/openembedded-core/scripts/lib/wic/canned-wks/
-    efi-bootdisk.wks.in" } }        <function 1>    3
-    [DEBUG][2026-03-21 03:59:55] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "rpc.send"      { id = 15, jsonrpc = "2.0", method = "textDocument/completion"
-    , params = { context = { triggerKind = 1 }, position = { character = 0, line = 0 }, textDocument = { uri = "file:///home/kin/src/wksls/tests/openembedded-core/scripts/lib/wic
-    /canned-wks/efi-bootdisk.wks.in" } } }
-    [DEBUG][2026-03-21 03:59:55] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "rpc.receive"   { id = 15, jsonrpc = "2.0", result = { { kind = 14, label = "b
-    ootloader" }, { kind = 14, label = "part" }, { kind = 14, label = "partition" }, { kind = 5, label = "--active" }, { kind = 5, label = "--align" }, { kind = 5, label = "--app
-    end" }, { kind = 5, label = "--configfile" }, { kind = 5, label = "--exclude-path" }, { kind = 5, label = "--extra-filesystem-space" }, { kind = 5, label = "--extra-partition
-    -space" }, { kind = 5, label = "--fixed-size" }, { kind = 5, label = "--fsoptions" }, { kind = 5, label = "--fstype" }, { kind = 5, label = "--fsuuid" }, { kind = 5, label =
-    "--label" }, { kind = 5, label = "--mkfs-extraopts" }, { kind = 5, label = "--no-table" }, { kind = 5, label = "--offset" }, { kind = 5, label = "--ondisk" }, { kind = 5, lab
-    el = "--ondrive" }, { kind = 5, label = "--overhead-factor" }, { kind = 5, label = "--part-name" }, { kind = 5, label = "--part-type" }, { kind = 5, label = "--ptable" }, { k
-    ind = 5, label = "--rootfs" }, { kind = 5, label = "--rootfs-dir" }, { kind = 5, label = "--size" }, { kind = 5, label = "--source" }, { kind = 5, label = "--sourceparams" },
-     { kind = 5, label = "--system-id" }, { kind = 5, label = "--timeout" }, { kind = 5, label = "--use-uuid" }, { kind = 5, label = "--uuid" } } }
-    [DEBUG][2026-03-21 04:00:06] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "omnifunc.findstart"    { base = "", findstart = 1 }
-    [DEBUG][2026-03-21 04:00:06] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "LSP[wks]"      "client.request"        2       "textDocument/completion"    {
-     context = { triggerKind = 1 }, position = { character = 24, line = 1 }, textDocument = { uri = "file:///home/kin/src/wksls/tests/openembedded-core/scripts/lib/wic/canned-wks
-    /efi-bootdisk.wks.in" } }       <function 1>    3
-    [DEBUG][2026-03-21 04:00:06] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "rpc.send"      { id = 16, jsonrpc = "2.0", method = "textDocument/completion"
-    , params = { context = { triggerKind = 1 }, position = { character = 24, line = 1 }, textDocument = { uri = "file:///home/kin/src/wksls/tests/openembedded-core/scripts/lib/wi
-    c/canned-wks/efi-bootdisk.wks.in" } } }
-    [DEBUG][2026-03-21 04:00:06] ...unwrapped-7a8d316/share/nvim/runtime/lua/vim/lsp/log.lua:151    "rpc.receive"   { id = 16, jsonrpc = "2.0", result = { { kind = 14, label = "b
-    ootloader" }, { kind = 14, label = "part" }, { kind = 14, label = "partition" }, { kind = 5, label = "--active" }, { kind = 5, label = "--align" }, { kind = 5, label = "--app
-    end" }, { kind = 5, label = "--configfile" }, { kind = 5, label = "--exclude-path" }, { kind = 5, label = "--extra-filesystem-space" }, { kind = 5, label = "--extra-partition
-    -space" }, { kind = 5, label = "--fixed-size" }, { kind = 5, label = "--fsoptions" }, { kind = 5, label = "--fstype" }, { kind = 5, label = "--fsuuid" }, { kind = 5, label =
-    "--label" }, { kind = 5, label = "--mkfs-extraopts" }, { kind = 5, label = "--no-table" }, { kind = 5, label = "--offset" }, { kind = 5, label = "--ondisk" }, { kind = 5, lab
-    el = "--ondrive" }, { kind = 5, label = "--overhead-factor" }, { kind = 5, label = "--part-name" }, { kind = 5, label = "--part-type" }, { kind = 5, label = "--ptable" }, { k
-    ind = 5, label = "--rootfs" }, { kind = 5, label = "--rootfs-dir" }, { kind = 5, label = "--size" }, { kind = 5, label = "--source" }, { kind = 5, label = "--sourceparams" },
-     { kind = 5, label = "--system-id" }, { kind = 5, label = "--timeout" }, { kind = 5, label = "--use-uuid" }, { kind = 5, label = "--uuid" } } }
-
-
-- add tests to capture these bugs then fix them
-
-- completion for every argument to every type of option does not work. for
-  example:
-
-  --ptable
-  --source
-
-- go to definition for the source plugin arguments.
-- go to definition for everything possible. This might just be for source
-  plugins though
-
-- bootloader lines should only complete with bootloader arguments and vice
-  versa for part
-
-```
-
 - getting the docs locally instead of saved with the language server so that it
   always gets the most relavent info
 
@@ -162,4 +108,5 @@ in the `tests/lsts` submodule.
   A server that pretty-prints its JSON would never match a fixture even if the
   data is semantically identical.
 
-
+- allow fixtures to support preprocessing so that one developers path isn't
+  hardcoded into every test
