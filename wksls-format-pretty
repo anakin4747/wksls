@@ -171,13 +171,18 @@ normalize_log_line() {
   # Condense bats stack trace lines:
   #   (from function `foo' in file ./bar/baz, line 42,
   #   in test file foo.bats, line 7)
-  # into: filepath:linenumber
+  # into: function foo filepath:linenumber  (or just filepath:linenumber for the call site)
   if [[ "$line" =~ ^[[:space:]]*[\(\`]*(from[[:space:]]function|in[[:space:]]test[[:space:]]file) ]]; then
-    local file lineno
+    local file lineno func
     file="$(printf '%s' "$line" | sed "s/.*in [a-z ]*file \([^,)]*\).*/\1/")"
     lineno="$(printf '%s' "$line" | sed "s/.*line \([0-9]*\)[,)].*/\1/")"
     if [[ "$file" != "$line" && "$lineno" != "$line" ]]; then
-      printf '%s:%s' "$file" "$lineno"
+      func="$(printf '%s' "$line" | sed "s/.*from function \`\([^']*\)'.*/\1/")"
+      if [[ "$func" != "$line" ]]; then
+        printf 'function %s %s:%s' "$func" "$file" "$lineno"
+      else
+        printf '%s:%s' "$file" "$lineno"
+      fi
       return
     fi
   fi
