@@ -23,3 +23,9 @@ teardown() {
         "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
         "fixtures/hover_bootloader.rpc.json"
 }
+
+@test "hover over part returns documentation" {
+    lsts_hover \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 0 \
+        "fixtures/hover_part.rpc.json"
+}
