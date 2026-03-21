@@ -44,7 +44,7 @@ Fix the code accordingly in new commits.
 - [x] `textDocument/completion` — enumerate all keywords and flags as completions
 - [ ] `textDocument/didClose` — free memory and complete the document lifecycle; blocked on `lsts_close` upstream
 - [ ] `shutdown` — respond to shutdown before exit (currently non-conformant); blocked on `lsts_shutdown` upstream
-- [ ] `textDocument/diagnostics` — validate directive syntax and flag combinations
+- [ ] `textDocument/diagnostics` — validate directive syntax and flag combinations; push model needs an `lsts_recv_notification` helper upstream; pull model (`textDocument/diagnostic`, LSP 3.17) also has no lsts helper
 
 - create a vim ftplugin how of this
 
@@ -63,6 +63,10 @@ rather than calling `lsts_notify`/`lsts_request` inline.
 - **`lsts_shutdown`:** A helper that sends the `shutdown` request and waits for
   a response, then sends `exit`. Needed before a conformant shutdown test can be
   written using lsts conventions.
+
+- **`lsts_recv_notification`:** A helper that reads messages until a
+  server-initiated notification (no `id`, has `method`) is received. Needed to
+  test push-model diagnostics (`textDocument/publishDiagnostics`).
 
 ## Potential lsts bugs to upstream
 
