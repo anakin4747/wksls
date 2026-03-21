@@ -105,6 +105,67 @@ line_start_at() {
     [[ -z "${before//[$'\t ']}" ]]
 }
 
+# Walk up the directory tree from the given path (which may be a file or
+# directory) until a directory containing oe-init-build-env is found.
+# Prints the root directory and returns 0, or returns 1 if not found.
+find_oe_root() {
+    local path="$1"
+    local dir
+    # Start from the directory containing the path.
+    if [[ -d "$path" ]]; then
+        dir="$path"
+    else
+        dir="${path%/*}"
+    fi
+    while [[ -n "$dir" && "$dir" != "/" ]]; do
+        if [[ -e "$dir/oe-init-build-env" ]]; then
+            printf '%s' "$dir"
+            return 0
+        fi
+        dir="${dir%/*}"
+    done
+    return 1
+}
+
+# Given an OE root directory and a source plugin name, print the absolute path
+# to the plugin's Python source file and return 0.  Returns 1 if the file does
+# not exist.
+source_plugin_path() {
+    local oe_root="$1" plugin_name="$2"
+    local path="$oe_root/scripts/lib/wic/plugins/source/${plugin_name}.py"
+    if [[ -f "$path" ]]; then
+        printf '%s' "$path"
+        return 0
+    fi
+    return 1
+}
+
+# If the cursor is positioned on the value of a --source flag (either
+# --source=<name> with cursor on <name>, or --source <name> with cursor on
+# <name>), print the plugin name and return 0.  Returns 1 otherwise.
+source_value_at() {
+    local text="$1" line="$2" character="$3"
+    local flag
+    # Check --source=<name> form (cursor in value of = token).
+    flag="$(flag_at "$text" "$line" "$character")"
+    if [[ "$flag" == "--source" ]]; then
+        local TOKEN WORD
+        _token_at "$text" "$line" "$character"
+        printf '%s' "${TOKEN#*=}"
+        return 0
+    fi
+    # Check --source <name> form (cursor on space-separated value).
+    flag="$(prev_flag_at "$text" "$line" "$character")"
+    if [[ "$flag" == "--source" ]]; then
+        local TOKEN WORD
+        _token_at "$text" "$line" "$character"
+        # TOKEN is the plugin name (strip any =value suffix just in case).
+        printf '%s' "${TOKEN%%=*}"
+        return 0
+    fi
+    return 1
+}
+
 # Send a hover response with a markdown value.
 send_hover() {
     local id="$1" doc="$2"
@@ -523,7 +584,7 @@ while recv; do
 
     case "$method" in
         initialize)
-            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"completionProvider\":{},\"textDocumentSync\":{\"openClose\":true,\"change\":1}}}}"
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"completionProvider\":{},\"definitionProvider\":true,\"textDocumentSync\":{\"openClose\":true,\"change\":1}}}}"
             ;;
         textDocument/didOpen)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
@@ -550,6 +611,30 @@ while recv; do
                 send_completion "$id" "keywords"
             else
                 send_completion "$id" "flags"
+            fi
+            ;;
+        textDocument/definition)
+            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
+            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
+            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
+            text="${DOC_TEXT["$uri"]:-}"
+            plugin_name="$(source_value_at "$text" "$line" "$character")" || true
+            if [[ -n "$plugin_name" ]]; then
+                # Resolve the local filesystem path from the URI.
+                local_path="${uri#file://}"
+                oe_root="$(find_oe_root "$local_path")" || oe_root=""
+                target=""
+                if [[ -n "$oe_root" ]]; then
+                    target="$(source_plugin_path "$oe_root" "$plugin_name")" || target=""
+                fi
+                if [[ -n "$target" ]]; then
+                    target_uri="file://${target}"
+                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}}"
+                else
+                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
+                fi
+            else
+                send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
             fi
             ;;
         textDocument/hover)
