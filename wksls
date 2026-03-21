@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+set -o errexit
+set -o nounset
+set -o pipefail
 
 # Send a JSON-RPC message with a Content-Length header on stdout.
 send() {
@@ -340,7 +343,7 @@ while recv; do
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
             character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
-            text="${DOC_TEXT["$uri"]}"
+            text="${DOC_TEXT["$uri"]:-}"
             word="$(word_at "$text" "$line" "$character")"
             case "$word" in
                 bootloader)             send_hover "$id" "$BOOTLOADER_DOC" ;;
