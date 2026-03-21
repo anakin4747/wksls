@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":[{"label":"bootimg_biosplusefi","kind":12},{"label":"bootimg_efi","kind":12},{"label":"bootimg_partition","kind":12},{"label":"bootimg_pcbios","kind":12},{"label":"empty","kind":12},{"label":"extra_partition","kind":12},{"label":"isoimage_isohybrid","kind":12},{"label":"rawcopy","kind":12},{"label":"rootfs","kind":12}]}
