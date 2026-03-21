@@ -41,7 +41,7 @@ word_at() {
 }
 
 BOOTLOADER_DOC="$(cat <<'HEREDOC'
-## bootloader
+## Command: bootloader
 
 This command specifies how the bootloader should be configured and supports the following options:
 
