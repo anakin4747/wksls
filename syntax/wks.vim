@@ -8,24 +8,24 @@ endif
 syntax match wksComment /#.*/
 highlight link wksComment Comment
 
-" Directives
-syntax keyword wksDirective part bootloader include
+" Directives ('partition' is a valid alias for 'part')
+syntax keyword wksDirective part partition bootloader include
 highlight link wksDirective Statement
 
 " Boolean flags (no value)
-syntax match wksBoolFlag /--\(active\|use-uuid\|rootfs\|no-table\)\>/
+syntax match wksBoolFlag /--\(active\|use-uuid\|no-table\)\>/
 highlight link wksBoolFlag Special
 
 " Long options that take a value
-syntax match wksOption /--\(source\|sourceparams\|ondisk\|fstype\|label\|align\|size\|ptable\|timeout\|append\|configfile\|fsuuid\|part-name\|rootfs-dir\)\>/
+syntax match wksOption /--\(source\|sourceparams\|ondisk\|ondrive\|fstype\|fsoptions\|label\|align\|size\|fixed-size\|offset\|exclude-path\|extra-filesystem-space\|extra-partition-space\|overhead-factor\|part-name\|part-type\|uuid\|fsuuid\|system-id\|mkfs-extraopts\|rootfs-dir\|rootfs\|ptable\|timeout\|append\|configfile\)\>/
 highlight link wksOption Identifier
 
 " Quoted strings
 syntax region wksString start=/"/ end=/"/ contains=wksVar
 highlight link wksString String
 
-" Variable substitutions inside strings e.g. ${KERNEL_CONSOLE}
-syntax match wksVar /\${[A-Z_][A-Z0-9_]*}/ contained
+" Variable substitutions: ${VAR_NAME} — inside strings and unquoted
+syntax match wksVar /\${[A-Za-z_][A-Za-z0-9_]*}/
 highlight link wksVar PreProc
 
 " Unquoted = values (e.g. --fstype=ext4)
@@ -33,11 +33,11 @@ syntax match wksValue /=\zs[^ \t"]\+/
 highlight link wksValue String
 
 " Mount points: /, /boot, /opt/...
-syntax match wksMountPoint /\s\zs\/[^ \t]*/
+syntax match wksMountPoint /\s\zs\/[^ \t=]*/
 highlight link wksMountPoint Number
 
-" Disk identifiers: sda, sdb, nvme0n1, mmcblk0, cd
-syntax match wksDisk /\<\(sda\|sdb\|sdc\|nvme[0-9]n[0-9]\|mmcblk[0-9]\|cd\)\>/
+" Disk identifiers: sda–sdz, nvme<N>n<N>, mmcblk<N>
+syntax match wksDisk /\<\(sd[a-z]\+\|nvme[0-9]\+n[0-9]\+\|mmcblk[0-9]\+\)\>/
 highlight link wksDisk Number
 
 let b:current_syntax = "wks"
