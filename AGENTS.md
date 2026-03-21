@@ -41,9 +41,9 @@ Fix the code accordingly in new commits.
 ## Priority: LSP method coverage
 
 - [x] `textDocument/didChange` — keep in-memory text in sync after edits
-- [ ] `textDocument/completion` — enumerate all keywords and flags as completions
-- [ ] `textDocument/didClose` — free memory and complete the document lifecycle
-- [ ] `shutdown` — respond to shutdown before exit (currently non-conformant)
+- [x] `textDocument/completion` — enumerate all keywords and flags as completions
+- [ ] `textDocument/didClose` — free memory and complete the document lifecycle; blocked on `lsts_close` upstream
+- [ ] `shutdown` — respond to shutdown before exit (currently non-conformant); blocked on `lsts_shutdown` upstream
 - [ ] `textDocument/diagnostics` — validate directive syntax and flag combinations
 
 - create a vim ftplugin how of this
@@ -59,6 +59,10 @@ rather than calling `lsts_notify`/`lsts_request` inline.
 
 - **`lsts_close <path>`:** A helper for `textDocument/didClose`. Needed before
   a `didClose` test can be written using lsts conventions.
+
+- **`lsts_shutdown`:** A helper that sends the `shutdown` request and waits for
+  a response, then sends `exit`. Needed before a conformant shutdown test can be
+  written using lsts conventions.
 
 ## Potential lsts bugs to upstream
 
