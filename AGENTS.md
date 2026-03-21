@@ -68,6 +68,11 @@ rather than calling `lsts_notify`/`lsts_request` inline.
   server-initiated notification (no `id`, has `method`) is received. Needed to
   test push-model diagnostics (`textDocument/publishDiagnostics`).
 
+- **Position-only request helpers that skip implicit initialize/open:** `lsts_hover`
+  always calls `lsts_initialize` and `lsts_open` internally. Tests that need to
+  send a request mid-session (e.g. after a `didChange`) cannot use `lsts_hover`
+  and must hand-roll `lsts_request`/`lsts_recv_response` instead.
+
 ## Potential lsts bugs to upstream
 
 These were observed while debugging wksls and may warrant fixes or improvements

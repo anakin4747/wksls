@@ -33,9 +33,7 @@ teardown() {
 
     local uri="file://$LSTS_ROOT/fixtures/hover.wks"
 
-    # Open file with a single token that is not --ptable.
-    lsts_notify "textDocument/didOpen" \
-        "{\"textDocument\":{\"uri\":\"${uri}\",\"languageId\":\"wks\",\"version\":1,\"text\":\"bootloader\"}}"
+    lsts_open "fixtures/hover.wks"
 
     # Replace the full text with --ptable via didChange.
     lsts_notify "textDocument/didChange" \

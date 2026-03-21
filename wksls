@@ -57,6 +57,49 @@ send_hover() {
     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
 }
 
+# Send a completion response listing all keywords and flags.
+send_completion() {
+    local id="$1"
+    local jq_prog items
+    jq_prog='[
+        {label:"bootloader",  kind:14},
+        {label:"part",        kind:14},
+        {label:"partition",   kind:14},
+        {label:"--active",              kind:5},
+        {label:"--align",               kind:5},
+        {label:"--append",              kind:5},
+        {label:"--configfile",          kind:5},
+        {label:"--exclude-path",        kind:5},
+        {label:"--extra-filesystem-space", kind:5},
+        {label:"--extra-partition-space",  kind:5},
+        {label:"--fixed-size",          kind:5},
+        {label:"--fsoptions",           kind:5},
+        {label:"--fstype",              kind:5},
+        {label:"--fsuuid",              kind:5},
+        {label:"--label",               kind:5},
+        {label:"--mkfs-extraopts",      kind:5},
+        {label:"--no-table",            kind:5},
+        {label:"--offset",              kind:5},
+        {label:"--ondisk",              kind:5},
+        {label:"--ondrive",             kind:5},
+        {label:"--overhead-factor",     kind:5},
+        {label:"--part-name",           kind:5},
+        {label:"--part-type",           kind:5},
+        {label:"--ptable",              kind:5},
+        {label:"--rootfs",              kind:5},
+        {label:"--rootfs-dir",          kind:5},
+        {label:"--size",                kind:5},
+        {label:"--source",              kind:5},
+        {label:"--sourceparams",        kind:5},
+        {label:"--system-id",           kind:5},
+        {label:"--timeout",             kind:5},
+        {label:"--use-uuid",            kind:5},
+        {label:"--uuid",                kind:5}
+    ]'
+    items="$(jq -cn "$jq_prog")"
+    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":${items}}"
+}
+
 BOOTLOADER_DOC="$(cat <<'HEREDOC'
 ## Command: bootloader
 
@@ -389,7 +432,7 @@ while recv; do
             DOC_TEXT["$uri"]="$text"
             ;;
         textDocument/completion)
-            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":[{\"label\":\"bootloader\",\"kind\":14},{\"label\":\"part\",\"kind\":14},{\"label\":\"partition\",\"kind\":14},{\"label\":\"--active\",\"kind\":5},{\"label\":\"--align\",\"kind\":5},{\"label\":\"--append\",\"kind\":5},{\"label\":\"--configfile\",\"kind\":5},{\"label\":\"--exclude-path\",\"kind\":5},{\"label\":\"--extra-filesystem-space\",\"kind\":5},{\"label\":\"--extra-partition-space\",\"kind\":5},{\"label\":\"--fixed-size\",\"kind\":5},{\"label\":\"--fsoptions\",\"kind\":5},{\"label\":\"--fstype\",\"kind\":5},{\"label\":\"--fsuuid\",\"kind\":5},{\"label\":\"--label\",\"kind\":5},{\"label\":\"--mkfs-extraopts\",\"kind\":5},{\"label\":\"--no-table\",\"kind\":5},{\"label\":\"--offset\",\"kind\":5},{\"label\":\"--ondisk\",\"kind\":5},{\"label\":\"--ondrive\",\"kind\":5},{\"label\":\"--overhead-factor\",\"kind\":5},{\"label\":\"--part-name\",\"kind\":5},{\"label\":\"--part-type\",\"kind\":5},{\"label\":\"--ptable\",\"kind\":5},{\"label\":\"--rootfs\",\"kind\":5},{\"label\":\"--rootfs-dir\",\"kind\":5},{\"label\":\"--size\",\"kind\":5},{\"label\":\"--source\",\"kind\":5},{\"label\":\"--sourceparams\",\"kind\":5},{\"label\":\"--system-id\",\"kind\":5},{\"label\":\"--timeout\",\"kind\":5},{\"label\":\"--use-uuid\",\"kind\":5},{\"label\":\"--uuid\",\"kind\":5}]}"
+            send_completion "$id"
             ;;
         textDocument/hover)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
