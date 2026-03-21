@@ -72,6 +72,17 @@ flag_at() {
     printf '%s' "${TOKEN%%=*}"
 }
 
+# Return true if the cursor is at the start of a line, meaning there is no
+# non-whitespace content before it. Used to decide whether to offer keyword
+# completions (bootloader/part/partition) or flag completions.
+line_start_at() {
+    local text="$1" line="$2" character="$3"
+    local line_text before
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    before="${line_text:0:$((character + 1))}"
+    [[ -z "${before//[$'\t ']}" ]]
+}
+
 # Send a hover response with a markdown value.
 send_hover() {
     local id="$1" doc="$2"
@@ -80,14 +91,24 @@ send_hover() {
     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
 }
 
-# Send a completion response. With no argument, returns all keywords and flags.
-# With a flag name argument, returns the enumerable values for that flag, or
-# falls back to the full list if the flag has no fixed value set.
+# Send a completion response.
+# context is one of:
+#   "keywords"  — return only directive keywords (bootloader, part, partition)
+#   "flags"     — return only flag names
+#   "--fstype"  — return enumerated fstype values
+#   "--ptable"  — return enumerated ptable values
 send_completion() {
-    local id="$1" flag="${2:-}"
+    local id="$1" context="${2:-flags}"
     local jq_prog items
 
-    case "$flag" in
+    case "$context" in
+        keywords)
+            jq_prog='[
+                {label:"bootloader", kind:14},
+                {label:"part",       kind:14},
+                {label:"partition",  kind:14}
+            ]'
+            ;;
         --fstype)
             jq_prog='[
                 {label:"btrfs",    kind:12},
@@ -110,9 +131,6 @@ send_completion() {
             ;;
         *)
             jq_prog='[
-                {label:"bootloader",  kind:14},
-                {label:"part",        kind:14},
-                {label:"partition",   kind:14},
                 {label:"--active",              kind:5},
                 {label:"--align",               kind:5},
                 {label:"--append",              kind:5},
@@ -487,7 +505,13 @@ while recv; do
             character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
             flag="$(flag_at "$text" "$line" "$character")"
-            send_completion "$id" "$flag"
+            if [[ -n "$flag" ]]; then
+                send_completion "$id" "$flag"
+            elif line_start_at "$text" "$line" "$character"; then
+                send_completion "$id" "keywords"
+            else
+                send_completion "$id" "flags"
+            fi
             ;;
         textDocument/hover)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
