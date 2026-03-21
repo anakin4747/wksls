@@ -279,42 +279,18 @@ teardown() {
 
 @test "definition on --source value finds plugin source file" {
     local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
-    local plugin_path="$LSTS_ROOT/openembedded-core/scripts/lib/wic/plugins/source/rootfs.py"
-    local expected_uri="file://${plugin_path}"
+    local plugin_uri="file://$LSTS_ROOT/openembedded-core/scripts/lib/wic/plugins/source/rootfs.py"
+    local fixture="$BATS_TEST_TMPDIR/definition_rootfs.rpc.json"
+    printf '{"jsonrpc":"2.0","id":2,"result":{"uri":"%s","range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}}}}\n' \
+        "$plugin_uri" > "$fixture"
 
-    lsts_initialize
-    lsts_open "$wks_path"
-    lsts_request "textDocument/definition" \
-        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":1,\"character\":20}}"
-    lsts_recv_response
-
-    echo "$LSTS_RESPONSE" | jq -e --arg uri "$expected_uri" \
-        '.result.uri == $uri'
-}
-
-@test "definition on --source value has zero range" {
-    local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
-
-    lsts_initialize
-    lsts_open "$wks_path"
-    lsts_request "textDocument/definition" \
-        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":1,\"character\":20}}"
-    lsts_recv_response
-
-    echo "$LSTS_RESPONSE" | jq -e \
-        '.result.range == {"start":{"line":0,"character":0},"end":{"line":0,"character":0}}'
+    lsts_definition "$wks_path" 1 20 "$fixture"
 }
 
 @test "definition on non-source token returns null" {
-    local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
-
-    lsts_initialize
-    lsts_open "$wks_path"
-    lsts_request "textDocument/definition" \
-        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":0,\"character\":0}}"
-    lsts_recv_response
-
-    echo "$LSTS_RESPONSE" | jq -e '.result == null'
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
+        "fixtures/definition_null.rpc.json"
 }
 
 @test "fails to start when jq is not installed" {
