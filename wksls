@@ -56,10 +56,17 @@ word_at() {
 
 # If the cursor is positioned in the value part of a flag=value token, return
 # the flag name (e.g. --fstype=ext4 with cursor on ext4 returns --fstype).
+# Also handles the cursor-on-whitespace case where the editor triggers
+# completion immediately after typing 'flag=' before any value character
+# (e.g. '--fstype= ' with cursor on the space): in that case WORD is empty
+# but the token to the left ends with '=', so we step one character back.
 # Returns empty string if the cursor is not in a value position.
 flag_at() {
     local TOKEN WORD
     _token_at "$1" "$2" "$3"
+    if [[ -z "$WORD" && "$3" -gt 0 ]]; then
+        _token_at "$1" "$2" "$(($3 - 1))"
+    fi
     [[ "$TOKEN" != *=* ]] && return 0
     [[ "$WORD"  != *=* ]] && return 0
     printf '%s' "${TOKEN%%=*}"
