@@ -59,6 +59,63 @@ This command specifies how the bootloader should be configured and supports the 
 HEREDOC
 )"
 
+PART_DOC="$(cat <<'HEREDOC'
+## Command: part or partition
+
+Either of these commands creates a partition on the system.
+
+The `mntpoint` must be one of:
+- `/path`: For example, "/", "/usr", or "/home"
+- `swap`: The created partition is used as swap space
+
+> **Note:** The mount program must understand the PARTUUID syntax you use with `--use-uuid` and non-root mountpoint, including swap.
+
+- `--size`: The minimum partition size. Integer with optional unit k/K (kibibyte), M (mebibyte), G (gibibyte). Default: M.
+
+- `--fixed-size`: The exact partition size. Cannot be used with `--size`.
+
+- `--source`: Names the source of data that populates the partition. Common value: `rootfs`.
+
+- `--ondisk` / `--ondrive`: Forces the partition onto a particular disk.
+
+- `--fstype`: Filesystem type. Valid values: `btrfs`, `erofs`, `ext2`, `ext3`, `ext4`, `squashfs`, `swap`, `vfat`.
+
+- `--fsoptions`: Free-form mount options string, copied into `/etc/fstab`. Default: "defaults".
+
+- `--label`: Label for the filesystem on the partition.
+
+- `--active`: Marks the partition as active.
+
+- `--align`: Start partition on boundaries of x KBytes.
+
+- `--offset`: Place the partition at exactly the specified offset. Units: s/S (512-byte sector), k/K, M, G. Default: k.
+
+- `--no-table`: Reserves space and populates the partition but does not add it to the partition table.
+
+- `--exclude-path`: Excludes the given relative path from the image. Only effective with the rootfs source plugin.
+
+- `--extra-filesystem-space`: Extra space after partition content. Default: 10M.
+
+- `--extra-partition-space`: Extra empty space after the filesystem. Default: 0M.
+
+- `--overhead-factor`: Multiplies the partition size. Must be >= 1. Default: 1.3.
+
+- `--part-name`: Name for GPT partitions.
+
+- `--part-type`: Partition type GUID for GPT partitions.
+
+- `--use-uuid`: Generate a random GUID for the partition, used in bootloader config.
+
+- `--uuid`: Specifies the partition UUID.
+
+- `--fsuuid`: Specifies the filesystem UUID.
+
+- `--system-id`: Partition system ID (one byte hexadecimal).
+
+- `--mkfs-extraopts`: Additional options passed to the `mkfs` utility.
+HEREDOC
+)"
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
@@ -84,6 +141,10 @@ while recv; do
             case "$word" in
                 bootloader)
                     value="$(jq -cn --arg v "$BOOTLOADER_DOC" '$v')"
+                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
+                    ;;
+                part|partition)
+                    value="$(jq -cn --arg v "$PART_DOC" '$v')"
                     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"contents\":{\"kind\":\"markdown\",\"value\":${value}}}}"
                     ;;
                 *)
