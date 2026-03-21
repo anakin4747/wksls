@@ -1,3 +1,40 @@
 #!/usr/bin/env bash
 
-echo "dummy wksls"
+# Send a JSON-RPC message with a Content-Length header on stdout.
+send() {
+    local body="$1"
+    local len
+    len="$(printf '%s' "$body" | wc -c)"
+    printf "Content-Length: %d\r\n\r\n%s" "$len" "$body"
+}
+
+# Read one JSON-RPC message from stdin into BODY.
+recv() {
+    local line content_length=0
+
+    while IFS= read -r line; do
+        line="${line%$'\r'}"
+        [[ -z "$line" ]] && break
+        if [[ "$line" =~ ^Content-Length:\ ([0-9]+)$ ]]; then
+            content_length="${BASH_REMATCH[1]}"
+        fi
+    done
+
+    [[ "$content_length" -eq 0 ]] && return 1
+
+    IFS= read -r -N "$content_length" BODY
+}
+
+while recv; do
+    method="$(printf '%s' "$BODY" | jq -r '.method // empty')"
+    id="$(printf '%s' "$BODY" | jq -r '.id // empty')"
+
+    case "$method" in
+        initialize)
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{}}}"
+            ;;
+        exit)
+            exit 0
+            ;;
+    esac
+done
