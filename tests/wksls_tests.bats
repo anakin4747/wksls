@@ -231,7 +231,7 @@ teardown() {
 
 @test "completion mid-line returns only flags" {
     lsts_completion "fixtures/completion_context.wks" 0 7 \
-        "fixtures/completion_flags.rpc.json"
+        "fixtures/completion_part_flags.rpc.json"
 }
 
 @test "completion after --fstype= returns fstype values" {
@@ -272,6 +272,18 @@ teardown() {
         "fixtures/completion_--source.rpc.json"
 }
 
+@test "completion mid-line on bootloader line returns only bootloader flags" {
+    lsts_completion \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 11 \
+        "fixtures/completion_bootloader_flags.rpc.json"
+}
+
+@test "completion mid-line on part line returns only part flags" {
+    lsts_completion \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 11 \
+        "fixtures/completion_part_flags.rpc.json"
+}
+
 @test "initialize advertises definitionProvider" {
     lsts_initialize
     echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.definitionProvider == true'
@@ -286,6 +298,50 @@ teardown() {
     lsts_definition \
         "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
         "fixtures/definition_null.rpc.json"
+}
+
+@test "definition on --source bootimg_efi finds plugin source file" {
+    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/mkefidisk.wks" 4 25 \
+        "fixtures/definition_bootimg_efi.rpc.json"
+}
+
+@test "definition on --source bootimg_partition finds plugin source file" {
+    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/sdimage-bootpart.wks" 4 28 \
+        "fixtures/definition_bootimg_partition.rpc.json"
+}
+
+@test "definition on --source bootimg_pcbios finds plugin source file" {
+    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks" 5 27 \
+        "fixtures/definition_bootimg_pcbios.rpc.json"
+}
+
+@test "definition on --source isoimage_isohybrid finds plugin source file" {
+    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/mkhybridiso.wks" 4 29 \
+        "fixtures/definition_isoimage_isohybrid.rpc.json"
+}
+
+@test "definition on --source bootimg_biosplusefi finds plugin source file" {
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-biosplusefi.wks" 0 29 \
+        "fixtures/definition_bootimg_biosplusefi.rpc.json"
+}
+
+@test "definition on --source empty finds plugin source file" {
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-empty.wks" 0 18 \
+        "fixtures/definition_empty.rpc.json"
+}
+
+@test "definition on --source extra_partition finds plugin source file" {
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-extra-partition.wks" 0 23 \
+        "fixtures/definition_extra_partition.rpc.json"
+}
+
+@test "definition on --source rawcopy finds plugin source file" {
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-rawcopy.wks" 0 19 \
+        "fixtures/definition_rawcopy.rpc.json"
 }
 
 @test "fails to start when jq is not installed" {
