@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--align`\n\nThis option is a Wic-specific option that says to start partitions on boundaries given x KBytes."}}}

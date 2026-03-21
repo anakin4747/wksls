@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--fsoptions`\n\nSpecifies a free-form string of options to be used when mounting the filesystem. This string is copied into the `/etc/fstab` file of the installed system and should be enclosed in quotes. If not specified, the default string is \"defaults\"."}}}

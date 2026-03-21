@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--overhead-factor`\n\nThis option is a Wic-specific option that multiplies the size of the partition by the option's value. You must supply a value greater than or equal to \"1\". The default value is \"1.3\"."}}}

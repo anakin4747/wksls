@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--timeout`\n\nSpecifies the number of seconds before the bootloader times out and boots the default option."}}}
