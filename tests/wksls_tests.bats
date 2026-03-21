@@ -6,12 +6,6 @@ lsts_set_cmd "wksls"
 lsts_set_root "$(dirname "$BATS_TEST_FILENAME")"
 lsts_set_langId "wks"
 
-setup_file() {
-    local plugin_uri="file://$LSTS_ROOT/openembedded-core/scripts/lib/wic/plugins/source/rootfs.py"
-    printf '{"jsonrpc":"2.0","id":2,"result":{"uri":"%s","range":{"start":{"line":27,"character":6},"end":{"line":27,"character":6}}}}\n' \
-        "$plugin_uri" > "$BATS_FILE_TMPDIR/definition_rootfs.rpc.json"
-}
-
 setup() {
     lsts_start
 }
@@ -285,7 +279,7 @@ teardown() {
 
 @test "definition on --source value finds plugin source file" {
     lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
-        "$BATS_FILE_TMPDIR/definition_rootfs.rpc.json"
+        "fixtures/definition_rootfs.rpc.json"
 }
 
 @test "definition on non-source token returns null" {
