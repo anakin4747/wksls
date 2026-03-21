@@ -1,1 +1,1 @@
-{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--fstype`\n\nSets the file system type for the partition. Valid values are:\n- `btrfs`\n- `erofs`\n- `ext2`\n- `ext3`\n- `ext4`\n- `squashfs`\n- `swap`\n- `vfat`"}}}
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--fstype`\n\nSets the file system type for the partition. Valid values are:\n- `btrfs`\n- `efi`\n- `erofs`\n- `ext2`\n- `ext3`\n- `ext4`\n- `msdos`\n- `squashfs`\n- `swap`\n- `vfat`"}}}

@@ -30,3 +30,4 @@ partition /
 --system-id
 --mkfs-extraopts
 --rootfs-dir
+--rootfs

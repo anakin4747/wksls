@@ -208,10 +208,12 @@ FSTYPE_DOC="$(cat <<'HEREDOC'
 
 Sets the file system type for the partition. Valid values are:
 - `btrfs`
+- `efi`
 - `erofs`
 - `ext2`
 - `ext3`
 - `ext4`
+- `msdos`
 - `squashfs`
 - `swap`
 - `vfat`
@@ -349,6 +351,17 @@ Without this option, Wic uses the default `IMAGE_ROOTFS` directory.
 HEREDOC
 )"
 
+ROOTFS_DOC="$(cat <<'HEREDOC'
+## `--rootfs`
+
+Specifies the image recipe name to use as the root filesystem source for the partition. Used in multi-rootfs images to populate different partitions from different image recipes.
+
+- `--rootfs=core-image-minimal`: Populates the partition from the `core-image-minimal` recipe's rootfs.
+
+This option names a recipe; `--rootfs-dir` names a directory path. The two serve the same purpose but via different reference mechanisms.
+HEREDOC
+)"
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
@@ -402,6 +415,7 @@ while recv; do
                 --system-id)            send_hover "$id" "$SYSTEM_ID_DOC" ;;
                 --mkfs-extraopts)       send_hover "$id" "$MKFS_EXTRAOPTS_DOC" ;;
                 --rootfs-dir)           send_hover "$id" "$ROOTFS_DIR_DOC" ;;
+                --rootfs)               send_hover "$id" "$ROOTFS_DOC" ;;
                 *)
                     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
                     ;;
