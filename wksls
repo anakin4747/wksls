@@ -140,6 +140,22 @@ source_plugin_path() {
     return 1
 }
 
+# Given a plugin Python source file, print the 0-indexed line and character of
+# the plugin class name and return 0.  Returns 1 if no class line is found.
+plugin_class_position() {
+    local file="$1"
+    local lineno=0 line_text
+    while IFS= read -r line_text; do
+        if [[ "$line_text" == class\ * ]]; then
+            # "class " is 6 characters; the class name starts at character 6.
+            printf '%d %d' "$lineno" 6
+            return 0
+        fi
+        lineno=$((lineno + 1))
+    done < "$file"
+    return 1
+}
+
 # If the cursor is positioned on the value of a --source flag (either
 # --source=<name> with cursor on <name>, or --source <name> with cursor on
 # <name>), print the plugin name and return 0.  Returns 1 otherwise.
@@ -629,7 +645,10 @@ while recv; do
             fi
             if [[ -n "$target" ]]; then
                 target_uri="file://${target}"
-                send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}}"
+                class_pos="$(plugin_class_position "$target")" || class_pos="0 0"
+                class_line="${class_pos% *}"
+                class_char="${class_pos#* }"
+                send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":${class_line},\"character\":${class_char}},\"end\":{\"line\":${class_line},\"character\":${class_char}}}}}"
             else
                 send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
             fi
