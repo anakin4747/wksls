@@ -272,6 +272,51 @@ teardown() {
         "fixtures/completion_--source.rpc.json"
 }
 
+@test "initialize advertises definitionProvider" {
+    lsts_initialize
+    echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.definitionProvider == true'
+}
+
+@test "definition on --source value finds plugin source file" {
+    local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
+    local plugin_path="$LSTS_ROOT/openembedded-core/scripts/lib/wic/plugins/source/rootfs.py"
+    local expected_uri="file://${plugin_path}"
+
+    lsts_initialize
+    lsts_open "$wks_path"
+    lsts_request "textDocument/definition" \
+        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":1,\"character\":20}}"
+    lsts_recv_response
+
+    echo "$LSTS_RESPONSE" | jq -e --arg uri "$expected_uri" \
+        '.result.uri == $uri'
+}
+
+@test "definition on --source value has zero range" {
+    local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
+
+    lsts_initialize
+    lsts_open "$wks_path"
+    lsts_request "textDocument/definition" \
+        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":1,\"character\":20}}"
+    lsts_recv_response
+
+    echo "$LSTS_RESPONSE" | jq -e \
+        '.result.range == {"start":{"line":0,"character":0},"end":{"line":0,"character":0}}'
+}
+
+@test "definition on non-source token returns null" {
+    local wks_path="openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in"
+
+    lsts_initialize
+    lsts_open "$wks_path"
+    lsts_request "textDocument/definition" \
+        "{\"textDocument\":{\"uri\":\"file://$LSTS_ROOT/$wks_path\"},\"position\":{\"line\":0,\"character\":0}}"
+    lsts_recv_response
+
+    echo "$LSTS_RESPONSE" | jq -e '.result == null'
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"
