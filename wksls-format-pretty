@@ -185,29 +185,48 @@ _parse_stack_line() {
   _st_func="$func"
 }
 
-# Pending stack trace frames: parallel arrays of file:lineno and funcname.
+# Return 1 if the line is the bats "`cmd' failed" line that should be dropped.
+_is_failed_cmd_line() {
+  [[ "$1" =~ ^[[:space:]]*\`.*\'[[:space:]]failed$ ]]
+}
+
+# Extract a function name from an error message of the form "funcname: message".
+_error_func() {
+  local msg="$1"
+  local trimmed="${msg#"${msg%%[![:space:]]*}"}"
+  local func="${trimmed%%:*}"
+  # Accept only if it looks like a shell identifier and a colon followed by a space was present.
+  if [[ "$func" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ && "$trimmed" == *": "* ]]; then
+    printf '%s' "$func"
+  fi
+}
+
+# Pending stack trace frames: parallel arrays of loc (file:lineno) and funcname.
 _st_locs=()
 _st_funcs=()
 
-# Flush any buffered stack trace lines, aligned as abspath:lineno:funcname.
+# Flush buffered stack trace lines as abspath:lineno:funcname.
 _flush_stack() {
   [[ ${#_st_locs[@]} -eq 0 ]] && return
-  local max_len=0 loc
-  for loc in "${_st_locs[@]}"; do
-    (( ${#loc} > max_len )) && max_len=${#loc}
-  done
   local i
   for (( i = 0; i < ${#_st_locs[@]}; i++ )); do
-    loc="${_st_locs[$i]}"
+    local loc="${_st_locs[$i]}"
     local func="${_st_funcs[$i]}"
     if [[ -n "$func" ]]; then
-      buffer '   %-*s  %s\n' "$max_len" "$loc" "$func"
+      buffer '   %s:%s\n' "$loc" "$func"
     else
       buffer '   %s\n' "$loc"
     fi
   done
   _st_locs=()
   _st_funcs=()
+}
+
+# Attach func to the last buffered stack frame (the call-site frame).
+_annotate_last_frame() {
+  local func="$1"
+  local last=$(( ${#_st_locs[@]} - 1 ))
+  [[ $last -ge 0 && -z "${_st_funcs[$last]}" ]] && _st_funcs[last]="$func"
 }
 
 log() {
@@ -225,6 +244,19 @@ log() {
     return
   fi
 
+  # Drop the "`cmd' failed" line; its info is redundant with the error message.
+  if _is_failed_cmd_line "$1"; then
+    return
+  fi
+
+  # If an error message follows the stack, pull its function name onto the
+  # call-site frame before flushing.
+  if [[ ${#_st_locs[@]} -gt 0 ]]; then
+    local ef
+    ef="$(_error_func "$1")"
+    [[ -n "$ef" ]] && _annotate_last_frame "$ef"
+  fi
+
   _flush_stack
 
   if [[ -n "$color" ]]; then
@@ -232,7 +264,7 @@ log() {
   else
     clear_color
   fi
-  buffer '   %s\n' "$1"
+  buffer '       %s\n' "$1"
   clear_color
 }
 
