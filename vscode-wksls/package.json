@@ -1,0 +1,29 @@
+{
+  "name": "wksls",
+  "displayName": "WKS Language Server",
+  "description": "Language support for OpenEmbedded/Yocto Wic Kickstart (.wks) files",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:wks"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "wks",
+        "aliases": ["WKS", "wks"],
+        "extensions": [".wks"],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}
