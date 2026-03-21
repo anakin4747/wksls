@@ -224,8 +224,13 @@ teardown() {
     lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
 }
 
-@test "completion returns all keywords and flags" {
-    lsts_completion "fixtures/hover.wks" 0 0 "fixtures/completion.rpc.json"
+@test "completion at line start returns only keywords" {
+    lsts_completion "fixtures/completion_context.wks" 1 0 "fixtures/completion_keywords.rpc.json"
+}
+
+@test "completion mid-line returns only flags" {
+    # char 7 is the start of '--source', after the 'part /' keyword+arg
+    lsts_completion "fixtures/completion_context.wks" 0 7 "fixtures/completion_flags.rpc.json"
 }
 
 @test "completion after --fstype= returns fstype values" {
