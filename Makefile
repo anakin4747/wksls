@@ -1,4 +1,6 @@
-.PHONY: all test lint install
+.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext
+
+PREFIX ?= /usr/local
 
 all:
 	nix develop --command make test lint
@@ -11,3 +13,13 @@ test:
 
 install:
 	nix profile install .
+
+install-manual:
+	install -m 755 wksls $(PREFIX)/bin/wksls
+
+uninstall-manual:
+	rm -f $(PREFIX)/bin/wksls
+
+install-vscode-ext:
+	mkdir -p ~/.vscode-oss/extensions/wksls-0.0.1
+	cp -r vscode-wksls/. ~/.vscode-oss/extensions/wksls-0.0.1
