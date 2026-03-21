@@ -38,6 +38,28 @@ Fix the code accordingly in new commits.
 
 # TODOs
 
+## Priority: LSP method coverage
+
+- [x] `textDocument/didChange` — keep in-memory text in sync after edits
+- [ ] `textDocument/completion` — enumerate all keywords and flags as completions
+- [ ] `textDocument/didClose` — free memory and complete the document lifecycle
+- [ ] `shutdown` — respond to shutdown before exit (currently non-conformant)
+- [ ] `textDocument/diagnostics` — validate directive syntax and flag combinations
+
+- create a vim ftplugin how of this
+
+## Potential lsts enhancements to upstream
+
+These are missing helpers that would allow wksls tests to use lsts conventions
+rather than calling `lsts_notify`/`lsts_request` inline.
+
+- **`lsts_change <path> <version> <new-text>`:** A helper for
+  `textDocument/didChange` (full-sync). Would let the `didChange` test use a
+  single lsts call instead of hand-building the notification params.
+
+- **`lsts_close <path>`:** A helper for `textDocument/didClose`. Needed before
+  a `didClose` test can be written using lsts conventions.
+
 ## Potential lsts bugs to upstream
 
 These were observed while debugging wksls and may warrant fixes or improvements
@@ -64,3 +86,5 @@ in the `tests/lsts` submodule.
   '` in `lsts_recv` means fixture files must also have all whitespace collapsed.
   A server that pretty-prints its JSON would never match a fixture even if the
   data is semantically identical.
+
+

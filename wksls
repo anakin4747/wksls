@@ -376,11 +376,16 @@ while recv; do
 
     case "$method" in
         initialize)
-            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"textDocumentSync\":{\"openClose\":true}}}}"
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"textDocumentSync\":{\"openClose\":true,\"change\":1}}}}"
             ;;
         textDocument/didOpen)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             text="$(printf '%s' "$BODY" | jq -r '.params.textDocument.text')"
+            DOC_TEXT["$uri"]="$text"
+            ;;
+        textDocument/didChange)
+            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
+            text="$(printf '%s' "$BODY" | jq -r '.params.contentChanges[-1].text')"
             DOC_TEXT["$uri"]="$text"
             ;;
         textDocument/hover)
