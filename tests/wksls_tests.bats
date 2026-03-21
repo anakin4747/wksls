@@ -59,7 +59,9 @@ teardown() {
 }
 
 @test "hover over partition returns documentation" {
-    lsts_hover "fixtures/hover.wks" 0 0 "fixtures/hover_part.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 0 0 \
+        "fixtures/hover_part.rpc.json"
 }
 
 @test "hover over --source returns documentation" {
@@ -177,80 +179,110 @@ teardown() {
 }
 
 @test "hover over --fixed-size returns documentation" {
-    lsts_hover "fixtures/hover.wks" 1 0 "fixtures/hover_--fixed-size.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 1 0 \
+        "fixtures/hover_--fixed-size.rpc.json"
 }
 
 @test "hover over --ondrive returns documentation" {
-    lsts_hover "fixtures/hover.wks" 2 0 "fixtures/hover_--ondrive.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 2 0 \
+        "fixtures/hover_--ondrive.rpc.json"
 }
 
 @test "hover over --fsoptions returns documentation" {
-    lsts_hover "fixtures/hover.wks" 3 0 "fixtures/hover_--fsoptions.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 3 0 \
+        "fixtures/hover_--fsoptions.rpc.json"
 }
 
 @test "hover over --offset returns documentation" {
-    lsts_hover "fixtures/hover.wks" 4 0 "fixtures/hover_--offset.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 4 0 \
+        "fixtures/hover_--offset.rpc.json"
 }
 
 @test "hover over --no-table returns documentation" {
-    lsts_hover "fixtures/hover.wks" 5 0 "fixtures/hover_--no-table.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 5 0 \
+        "fixtures/hover_--no-table.rpc.json"
 }
 
 @test "hover over --extra-filesystem-space returns documentation" {
-    lsts_hover "fixtures/hover.wks" 6 0 "fixtures/hover_--extra-filesystem-space.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 6 0 \
+        "fixtures/hover_--extra-filesystem-space.rpc.json"
 }
 
 @test "hover over --extra-partition-space returns documentation" {
-    lsts_hover "fixtures/hover.wks" 7 0 "fixtures/hover_--extra-partition-space.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 7 0 \
+        "fixtures/hover_--extra-partition-space.rpc.json"
 }
 
 @test "hover over --uuid returns documentation" {
-    lsts_hover "fixtures/hover.wks" 8 0 "fixtures/hover_--uuid.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 8 0 \
+        "fixtures/hover_--uuid.rpc.json"
 }
 
 @test "hover over --system-id returns documentation" {
-    lsts_hover "fixtures/hover.wks" 9 0 "fixtures/hover_--system-id.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 9 0 \
+        "fixtures/hover_--system-id.rpc.json"
 }
 
 @test "hover over --mkfs-extraopts returns documentation" {
-    lsts_hover "fixtures/hover.wks" 10 0 "fixtures/hover_--mkfs-extraopts.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 10 0 \
+        "fixtures/hover_--mkfs-extraopts.rpc.json"
 }
 
 @test "hover over --rootfs returns documentation" {
-    lsts_hover "fixtures/hover.wks" 11 0 "fixtures/hover_--rootfs.rpc.json"
+    lsts_hover \
+        "fixtures/hover.wks" 11 0 \
+        "fixtures/hover_--rootfs.rpc.json"
 }
 
 @test "hover works when tokens are tab-separated" {
-    lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
+    lsts_hover \
+        "fixtures/hover_tabs.wks" 0 11 \
+        "fixtures/hover_--ptable.rpc.json"
 }
 
 @test "completion at line start returns only keywords" {
-    lsts_completion "fixtures/completion_context.wks" 1 0 \
+    lsts_completion \
+        "fixtures/completion_context.wks" 1 0 \
         "fixtures/completion_keywords.rpc.json"
 }
 
 @test "completion mid-line returns only flags" {
-    lsts_completion "fixtures/completion_context.wks" 0 7 \
+    lsts_completion \
+        "fixtures/completion_context.wks" 0 7 \
         "fixtures/completion_part_flags.rpc.json"
 }
 
 @test "completion after --fstype= returns fstype values" {
-    lsts_completion "fixtures/completion.wks" 0 10 \
+    lsts_completion \
+        "fixtures/completion.wks" 0 10 \
         "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= returns ptable values" {
-    lsts_completion "fixtures/completion.wks" 1 10 \
+    lsts_completion \
+        "fixtures/completion.wks" 1 10 \
         "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion after --fstype= with no value typed returns fstype values" {
-    lsts_completion "fixtures/completion_empty_value.wks" 0 32 \
+    lsts_completion \
+        "fixtures/completion_empty_value.wks" 0 32 \
         "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= with no value typed returns ptable values" {
-    lsts_completion "fixtures/completion_empty_value.wks" 1 20 \
+    lsts_completion \
+        "fixtures/completion_empty_value.wks" 1 20 \
         "fixtures/completion_--ptable.rpc.json"
 }
 
@@ -290,7 +322,8 @@ teardown() {
 }
 
 @test "definition on --source value finds plugin source file" {
-    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
         "fixtures/definition_rootfs.rpc.json"
 }
 
@@ -301,22 +334,26 @@ teardown() {
 }
 
 @test "definition on --source bootimg_efi finds plugin source file" {
-    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/mkefidisk.wks" 4 25 \
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/mkefidisk.wks" 4 25 \
         "fixtures/definition_bootimg_efi.rpc.json"
 }
 
 @test "definition on --source bootimg_partition finds plugin source file" {
-    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/sdimage-bootpart.wks" 4 28 \
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/sdimage-bootpart.wks" 4 28 \
         "fixtures/definition_bootimg_partition.rpc.json"
 }
 
 @test "definition on --source bootimg_pcbios finds plugin source file" {
-    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks" 5 27 \
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks" 5 27 \
         "fixtures/definition_bootimg_pcbios.rpc.json"
 }
 
 @test "definition on --source isoimage_isohybrid finds plugin source file" {
-    lsts_definition "openembedded-core/scripts/lib/wic/canned-wks/mkhybridiso.wks" 4 29 \
+    lsts_definition \
+        "openembedded-core/scripts/lib/wic/canned-wks/mkhybridiso.wks" 4 29 \
         "fixtures/definition_isoimage_isohybrid.rpc.json"
 }
 
