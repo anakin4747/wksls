@@ -3,7 +3,7 @@
 source ./tests/lsts/lsts
 
 lsts_set_cmd "wksls"
-lsts_set_root "$(dirname "$BATS_TEST_FILENAME")/openembedded-core/"
+lsts_set_root "$(dirname "$BATS_TEST_FILENAME")"
 lsts_set_langId "wks"
 
 setup() {
@@ -18,3 +18,8 @@ teardown() {
     lsts_initialize
 }
 
+@test "hover over bootloader returns documentation" {
+    lsts_hover \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
+        "fixtures/hover_bootloader.rpc.json"
+}
