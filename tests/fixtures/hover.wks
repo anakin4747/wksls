@@ -8,6 +8,7 @@ partition /
 --size
 --fixed-size
 --source
+--sourceparams
 --ondisk
 --ondrive
 --fstype
@@ -28,3 +29,4 @@ partition /
 --fsuuid
 --system-id
 --mkfs-extraopts
+--rootfs-dir

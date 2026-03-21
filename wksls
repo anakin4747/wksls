@@ -183,6 +183,19 @@ Names the source of the data that populates the partition. The most common value
 HEREDOC
 )"
 
+SOURCEPARAMS_DOC="$(cat <<'HEREDOC'
+## `--sourceparams`
+
+Passes a comma-separated list of key=value parameters to the source plugin named by `--source`. The accepted keys depend on the plugin.
+
+Common examples:
+- `--sourceparams="loader=grub-efi"`: Selects the EFI bootloader.
+- `--sourceparams="loader=systemd-boot"`: Selects systemd-boot.
+- `--sourceparams="file=<image>.ext4"`: Specifies a raw image file for the `rawcopy` plugin.
+- `--sourceparams="image_name=<name>"`: Names the hybrid ISO image for `isoimage-isohybrid`.
+HEREDOC
+)"
+
 ONDISK_DOC="$(cat <<'HEREDOC'
 ## `--ondisk` / `--ondrive`
 
@@ -324,6 +337,18 @@ This option specifies additional options to pass to the `mkfs` utility. Some def
 HEREDOC
 )"
 
+ROOTFS_DIR_DOC="$(cat <<'HEREDOC'
+## `--rootfs-dir`
+
+Overrides the path to the root filesystem that populates the partition. Useful in multi-rootfs images where different partitions are populated from different build directories.
+
+- `--rootfs-dir=rootfs1`: Uses the directory named `rootfs1` under the image work directory.
+- `--rootfs-dir=${IMAGE_ROOTFS}/boot`: Uses an absolute or variable-expanded path.
+
+Without this option, Wic uses the default `IMAGE_ROOTFS` directory.
+HEREDOC
+)"
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
@@ -356,6 +381,7 @@ while recv; do
                 --size)                 send_hover "$id" "$SIZE_DOC" ;;
                 --fixed-size)           send_hover "$id" "$FIXED_SIZE_DOC" ;;
                 --source)               send_hover "$id" "$SOURCE_DOC" ;;
+                --sourceparams)         send_hover "$id" "$SOURCEPARAMS_DOC" ;;
                 --ondisk|--ondrive)     send_hover "$id" "$ONDISK_DOC" ;;
                 --fstype)               send_hover "$id" "$FSTYPE_DOC" ;;
                 --fsoptions)            send_hover "$id" "$FSOPTIONS_DOC" ;;
@@ -375,6 +401,7 @@ while recv; do
                 --fsuuid)               send_hover "$id" "$FSUUID_DOC" ;;
                 --system-id)            send_hover "$id" "$SYSTEM_ID_DOC" ;;
                 --mkfs-extraopts)       send_hover "$id" "$MKFS_EXTRAOPTS_DOC" ;;
+                --rootfs-dir)           send_hover "$id" "$ROOTFS_DIR_DOC" ;;
                 *)
                     send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
                     ;;
