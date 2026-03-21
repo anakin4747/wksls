@@ -37,3 +37,30 @@ see how the code can be made cleaner:
 Fix the code accordingly in new commits.
 
 # TODOs
+
+## Potential lsts bugs to upstream
+
+These were observed while debugging wksls and may warrant fixes or improvements
+in the `tests/lsts` submodule.
+
+- **No strict mode:** `lsts` does not use `set -o errexit/nounset/pipefail`.
+  Errors in helper functions can silently pass tests that should fail.
+
+- **`lsts_initialize` does not assert specific capabilities:** It only checks
+  that `.result.capabilities` is an object. A server advertising no useful
+  capabilities (e.g. missing `hoverProvider` or wrong `textDocumentSync`)
+  would still pass the initialize test.
+
+- **`lsts_stop` sends `exit` with params `{}`:** The LSP spec defines `exit`
+  as a notification with no params. Sending `{}` is harmless for most servers
+  but is technically non-conformant.
+
+- **`lsts_recv_response` has no timeout on the outer loop:** The inner
+  `IFS= read` calls use `LSTS_TIMEOUT` but the `while true` loop itself has no
+  upper bound, so a server that never sends a response will hang the test
+  indefinitely rather than timing out cleanly.
+
+- **`LSTS_RESPONSE` normalises tabs and newlines to spaces:** The `tr '\t\n' '
+  '` in `lsts_recv` means fixture files must also have all whitespace collapsed.
+  A server that pretty-prints its JSON would never match a fixture even if the
+  data is semantically identical.
