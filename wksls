@@ -31,6 +31,9 @@ recv() {
 }
 
 # Return the word at the given line and character in the given text.
+# The word is the run of non-whitespace characters that contains the given
+# character position. Any trailing =value suffix is stripped so that
+# --fstype=ext4 returns --fstype.
 word_at() {
     local text="$1" line="$2" character="$3"
     local line_text
@@ -41,7 +44,9 @@ word_at() {
     word="${before##*[$'\t ']}"
     local after="${line_text:${#before}}"
     local rest="${after%%[$'\t ']*}"
-    printf '%s%s' "$word" "$rest"
+    local token="${word}${rest}"
+    # Strip any =value suffix (e.g. --fstype=ext4 -> --fstype).
+    printf '%s' "${token%%=*}"
 }
 
 # Send a hover response with a markdown value.
