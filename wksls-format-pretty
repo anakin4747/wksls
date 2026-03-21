@@ -166,6 +166,24 @@ timeout() {
   test_result=timeout
 }
 
+normalize_log_line() {
+  local line="$1"
+  # Condense bats stack trace lines:
+  #   (from function `foo' in file ./bar/baz, line 42,
+  #   in test file foo.bats, line 7)
+  # into: filepath:linenumber
+  if [[ "$line" =~ ^[[:space:]]*[\(\`]*(from[[:space:]]function|in[[:space:]]test[[:space:]]file) ]]; then
+    local file lineno
+    file="$(printf '%s' "$line" | sed "s/.*in [a-z ]*file \([^,)]*\).*/\1/")"
+    lineno="$(printf '%s' "$line" | sed "s/.*line \([0-9]*\)[,)].*/\1/")"
+    if [[ "$file" != "$line" && "$lineno" != "$line" ]]; then
+      printf '%s:%s' "$file" "$lineno"
+      return
+    fi
+  fi
+  printf '%s' "$line"
+}
+
 log() {
   case ${test_result} in
   pass)
@@ -178,7 +196,7 @@ log() {
     set_color 3
     ;;
   esac
-  buffer '   %s\n' "$1"
+  buffer '   %s\n' "$(normalize_log_line "$1")"
   clear_color
 }
 
