@@ -618,21 +618,18 @@ while recv; do
             line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
             character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
+            target=""
             plugin_name="$(source_value_at "$text" "$line" "$character")" || true
             if [[ -n "$plugin_name" ]]; then
-                # Resolve the local filesystem path from the URI.
                 local_path="${uri#file://}"
-                oe_root="$(find_oe_root "$local_path")" || oe_root=""
-                target=""
+                oe_root="$(find_oe_root "$local_path")" || true
                 if [[ -n "$oe_root" ]]; then
-                    target="$(source_plugin_path "$oe_root" "$plugin_name")" || target=""
+                    target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
                 fi
-                if [[ -n "$target" ]]; then
-                    target_uri="file://${target}"
-                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}}"
-                else
-                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
-                fi
+            fi
+            if [[ -n "$target" ]]; then
+                target_uri="file://${target}"
+                send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":0,\"character\":0},\"end\":{\"line\":0,\"character\":0}}}}"
             else
                 send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
             fi
