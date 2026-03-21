@@ -67,84 +67,92 @@ teardown() {
     lsts_hover "fixtures/hover.wks" 9 0 "fixtures/hover_--source.rpc.json"
 }
 
+@test "hover over --sourceparams returns documentation" {
+    lsts_hover "fixtures/hover.wks" 10 0 "fixtures/hover_--sourceparams.rpc.json"
+}
+
 @test "hover over --ondisk returns documentation" {
-    lsts_hover "fixtures/hover.wks" 10 0 "fixtures/hover_--ondisk.rpc.json"
+    lsts_hover "fixtures/hover.wks" 11 0 "fixtures/hover_--ondisk.rpc.json"
 }
 
 @test "hover over --ondrive returns documentation" {
-    lsts_hover "fixtures/hover.wks" 11 0 "fixtures/hover_--ondrive.rpc.json"
+    lsts_hover "fixtures/hover.wks" 12 0 "fixtures/hover_--ondrive.rpc.json"
 }
 
 @test "hover over --fstype returns documentation" {
-    lsts_hover "fixtures/hover.wks" 12 0 "fixtures/hover_--fstype.rpc.json"
+    lsts_hover "fixtures/hover.wks" 13 0 "fixtures/hover_--fstype.rpc.json"
 }
 
 @test "hover over --fsoptions returns documentation" {
-    lsts_hover "fixtures/hover.wks" 13 0 "fixtures/hover_--fsoptions.rpc.json"
+    lsts_hover "fixtures/hover.wks" 14 0 "fixtures/hover_--fsoptions.rpc.json"
 }
 
 @test "hover over --label returns documentation" {
-    lsts_hover "fixtures/hover.wks" 14 0 "fixtures/hover_--label.rpc.json"
+    lsts_hover "fixtures/hover.wks" 15 0 "fixtures/hover_--label.rpc.json"
 }
 
 @test "hover over --active returns documentation" {
-    lsts_hover "fixtures/hover.wks" 15 0 "fixtures/hover_--active.rpc.json"
+    lsts_hover "fixtures/hover.wks" 16 0 "fixtures/hover_--active.rpc.json"
 }
 
 @test "hover over --align returns documentation" {
-    lsts_hover "fixtures/hover.wks" 16 0 "fixtures/hover_--align.rpc.json"
+    lsts_hover "fixtures/hover.wks" 17 0 "fixtures/hover_--align.rpc.json"
 }
 
 @test "hover over --offset returns documentation" {
-    lsts_hover "fixtures/hover.wks" 17 0 "fixtures/hover_--offset.rpc.json"
+    lsts_hover "fixtures/hover.wks" 18 0 "fixtures/hover_--offset.rpc.json"
 }
 
 @test "hover over --no-table returns documentation" {
-    lsts_hover "fixtures/hover.wks" 18 0 "fixtures/hover_--no-table.rpc.json"
+    lsts_hover "fixtures/hover.wks" 19 0 "fixtures/hover_--no-table.rpc.json"
 }
 
 @test "hover over --exclude-path returns documentation" {
-    lsts_hover "fixtures/hover.wks" 19 0 "fixtures/hover_--exclude-path.rpc.json"
+    lsts_hover "fixtures/hover.wks" 20 0 "fixtures/hover_--exclude-path.rpc.json"
 }
 
 @test "hover over --extra-filesystem-space returns documentation" {
-    lsts_hover "fixtures/hover.wks" 20 0 "fixtures/hover_--extra-filesystem-space.rpc.json"
+    lsts_hover "fixtures/hover.wks" 21 0 "fixtures/hover_--extra-filesystem-space.rpc.json"
 }
 
 @test "hover over --extra-partition-space returns documentation" {
-    lsts_hover "fixtures/hover.wks" 21 0 "fixtures/hover_--extra-partition-space.rpc.json"
+    lsts_hover "fixtures/hover.wks" 22 0 "fixtures/hover_--extra-partition-space.rpc.json"
 }
 
 @test "hover over --overhead-factor returns documentation" {
-    lsts_hover "fixtures/hover.wks" 22 0 "fixtures/hover_--overhead-factor.rpc.json"
+    lsts_hover "fixtures/hover.wks" 23 0 "fixtures/hover_--overhead-factor.rpc.json"
 }
 
 @test "hover over --part-name returns documentation" {
-    lsts_hover "fixtures/hover.wks" 23 0 "fixtures/hover_--part-name.rpc.json"
+    lsts_hover "fixtures/hover.wks" 24 0 "fixtures/hover_--part-name.rpc.json"
 }
 
 @test "hover over --part-type returns documentation" {
-    lsts_hover "fixtures/hover.wks" 24 0 "fixtures/hover_--part-type.rpc.json"
+    lsts_hover "fixtures/hover.wks" 25 0 "fixtures/hover_--part-type.rpc.json"
 }
 
 @test "hover over --use-uuid returns documentation" {
-    lsts_hover "fixtures/hover.wks" 25 0 "fixtures/hover_--use-uuid.rpc.json"
+    lsts_hover "fixtures/hover.wks" 26 0 "fixtures/hover_--use-uuid.rpc.json"
 }
 
 @test "hover over --uuid returns documentation" {
-    lsts_hover "fixtures/hover.wks" 26 0 "fixtures/hover_--uuid.rpc.json"
+    lsts_hover "fixtures/hover.wks" 27 0 "fixtures/hover_--uuid.rpc.json"
 }
 
 @test "hover over --fsuuid returns documentation" {
-    lsts_hover "fixtures/hover.wks" 27 0 "fixtures/hover_--fsuuid.rpc.json"
+    lsts_hover "fixtures/hover.wks" 28 0 "fixtures/hover_--fsuuid.rpc.json"
 }
 
 @test "hover over --system-id returns documentation" {
-    lsts_hover "fixtures/hover.wks" 28 0 "fixtures/hover_--system-id.rpc.json"
+    lsts_hover "fixtures/hover.wks" 29 0 "fixtures/hover_--system-id.rpc.json"
 }
 
 @test "hover over --mkfs-extraopts returns documentation" {
-    lsts_hover "fixtures/hover.wks" 29 0 "fixtures/hover_--mkfs-extraopts.rpc.json"
+    lsts_hover "fixtures/hover.wks" 30 0 "fixtures/hover_--mkfs-extraopts.rpc.json"
+}
+
+@test "hover over --rootfs-dir returns documentation" {
+    lsts_hover "fixtures/hover.wks" 31 0 "fixtures/hover_--rootfs-dir.rpc.json"
 }
 
 @test "hover works when tokens are tab-separated" {
