@@ -146,3 +146,7 @@ teardown() {
 @test "hover over --mkfs-extraopts returns documentation" {
     lsts_hover "fixtures/hover.wks" 29 0 "fixtures/hover_--mkfs-extraopts.rpc.json"
 }
+
+@test "hover works when tokens are tab-separated" {
+    lsts_hover "fixtures/hover_tabs.wks" 0 11 "fixtures/hover_--ptable.rpc.json"
+}
