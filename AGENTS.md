@@ -46,7 +46,7 @@ Fix the code accordingly in new commits.
 - [ ] `shutdown` — respond to shutdown before exit (currently non-conformant); blocked on `lsts_shutdown` upstream
 - [ ] `textDocument/diagnostics` — validate directive syntax and flag combinations; push model needs an `lsts_recv_notification` helper upstream; pull model (`textDocument/diagnostic`, LSP 3.17) also has no lsts helper
 
-- create a vim ftplugin how of this
+- [x] create a vim ftplugin (`ftplugin/wks.vim`)
 
 ## Potential lsts enhancements to upstream
 
