@@ -35,3 +35,8 @@ see how the code can be made cleaner:
   test?
 
 Fix the code accordingly in new commits.
+
+# TODOs
+
+1. add hover tests for every time of token in wks files that comes with
+   documentation.
