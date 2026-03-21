@@ -206,17 +206,21 @@ _st_locs=()
 _st_funcs=()
 
 # Flush buffered stack trace lines as abspath:lineno:funcname.
+# Takes an optional color argument (passed to set_color).
 _flush_stack() {
   [[ ${#_st_locs[@]} -eq 0 ]] && return
+  local color="${1:-}"
   local i
   for (( i = 0; i < ${#_st_locs[@]}; i++ )); do
     local loc="${_st_locs[$i]}"
     local func="${_st_funcs[$i]}"
+    [[ -n "$color" ]] && set_color "$color"
     if [[ -n "$func" ]]; then
       buffer '   %s:%s\n' "$loc" "$func"
     else
       buffer '   %s\n' "$loc"
     fi
+    clear_color
   done
   _st_locs=()
   _st_funcs=()
@@ -257,7 +261,7 @@ log() {
     [[ -n "$ef" ]] && _annotate_last_frame "$ef"
   fi
 
-  _flush_stack
+  _flush_stack "$color"
 
   if [[ -n "$color" ]]; then
     set_color "$color"
