@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--configfile`\n\nSpecifies a user-defined configuration file for the bootloader. You can provide a full pathname for the file or a file located in the `canned-wks` folder. This option overrides all other bootloader options."}}}

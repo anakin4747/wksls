@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--label`\n\nSpecifies the label to give to the filesystem to be made on the partition. If the given label is already in use by another filesystem, a new label is created for the partition."}}}

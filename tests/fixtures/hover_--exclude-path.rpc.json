@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":{"contents":{"kind":"markdown","value":"## `--exclude-path`\n\nThis option is a Wic-specific option that excludes the given relative path from the resulting image. This option is only effective with the rootfs source plugin."}}}
