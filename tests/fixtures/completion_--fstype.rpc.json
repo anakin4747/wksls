@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","id":2,"result":[{"label":"btrfs","kind":12},{"label":"efi","kind":12},{"label":"erofs","kind":12},{"label":"ext2","kind":12},{"label":"ext3","kind":12},{"label":"ext4","kind":12},{"label":"msdos","kind":12},{"label":"squashfs","kind":12},{"label":"swap","kind":12},{"label":"vfat","kind":12}]}
