@@ -18,6 +18,11 @@ teardown() {
     lsts_initialize
 }
 
+@test "initialize advertises openClose textDocumentSync" {
+    lsts_initialize
+    echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.textDocumentSync.openClose == true'
+}
+
 @test "hover over bootloader returns documentation" {
     lsts_hover \
         "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
