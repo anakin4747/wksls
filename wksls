@@ -646,6 +646,8 @@ while recv; do
                 send_completion "$id" "$flag"
             elif line_start_at "$text" "$line" "$character"; then
                 send_completion "$id" "keywords"
+            elif [[ "$(directive_at "$text" "$line")" == "" ]]; then
+                send_completion "$id" "keywords"
             else
                 case "$(directive_at "$text" "$line")" in
                     bootloader) send_completion "$id" "bootloader_flags" ;;
