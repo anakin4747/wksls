@@ -612,6 +612,137 @@ This option names a recipe; `--rootfs-dir` names a directory path. The two serve
 HEREDOC
 )"
 
+SOURCE_PLUGIN_ROOTFS_DOC="$(cat <<'HEREDOC'
+## Source plugin: `rootfs`
+
+Populates the partition with the contents of the root filesystem.
+
+Wic creates a partition as large as needed and fills it with the contents of the root filesystem pointed to by the `-r` command-line option or the equivalent root filesystem derived from the `-e` option. The filesystem type is controlled by `--fstype`.
+
+Common usage:
+
+```
+part / --source rootfs --fstype=ext4 --label platform --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_BOOTIMG_EFI_DOC="$(cat <<'HEREDOC'
+## Source plugin: `bootimg_efi`
+
+Creates an EFI boot partition. Supports GRUB 2 and systemd-boot bootloaders.
+
+Use `--sourceparams` to select the bootloader:
+
+- `--sourceparams="loader=grub-efi"`: Use GRUB 2 for EFI boot.
+- `--sourceparams="loader=systemd-boot"`: Use systemd-boot.
+
+Common usage:
+
+```
+part /boot --source bootimg_efi --sourceparams="loader=grub-efi" --ondisk sda --label msdos --active --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_BOOTIMG_PARTITION_DOC="$(cat <<'HEREDOC'
+## Source plugin: `bootimg_partition`
+
+Creates a boot partition by copying files listed in the `IMAGE_BOOT_FILES` BitBake variable.
+
+Common usage:
+
+```
+part /boot --source bootimg_partition --ondisk sda --fstype=vfat --label boot --active --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_BOOTIMG_PCBIOS_DOC="$(cat <<'HEREDOC'
+## Source plugin: `bootimg_pcbios`
+
+Creates a legacy BIOS boot partition (MBR/MSDOS partition table) and installs a bootloader. Supports syslinux (default) and GRUB.
+
+Common usage:
+
+```
+part /boot --source bootimg_pcbios --ondisk sda --label boot --active --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_BOOTIMG_BIOSPLUSEFI_DOC="$(cat <<'HEREDOC'
+## Source plugin: `bootimg_biosplusefi`
+
+Creates a boot partition that supports both legacy BIOS and EFI booting in a single partition. Useful for managing mixed PC fleets where some machines lack EFI support.
+
+Common usage:
+
+```
+part /boot --source bootimg_biosplusefi --ondisk sda --active --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_EMPTY_DOC="$(cat <<'HEREDOC'
+## Source plugin: `empty`
+
+Creates an unformatted empty partition. Requires `--size` or `--fixed-size` to set the partition size.
+
+Optional `--sourceparams` to zero-fill the partition:
+
+- `--sourceparams="fill"`: Fill the entire partition with zeros. Requires `--fixed-size`.
+- `--sourceparams="size=<N>[S|K|M|G]"`: Zero the first N bytes of the partition.
+
+Common usage:
+
+```
+part foo --source empty --ondisk sda --size=1024 --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_EXTRA_PARTITION_DOC="$(cat <<'HEREDOC'
+## Source plugin: `extra_partition`
+
+Populates a partition with files listed in the `IMAGE_EXTRA_PARTITION_FILES` BitBake variable. Files must be deployed to `DEPLOY_DIR_IMAGE`. Supports glob patterns and file renaming.
+
+Common usage:
+
+```
+part /extra --source extra_partition --ondisk sda --fstype=ext4 --align 1024
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_ISOIMAGE_ISOHYBRID_DOC="$(cat <<'HEREDOC'
+## Source plugin: `isoimage_isohybrid`
+
+Creates a hybrid bootable ISO image that supports both legacy BIOS (syslinux) and EFI (GRUB) booting. The resulting image can be written to optical media or USB.
+
+Common usage:
+
+```
+part /boot --source isoimage_isohybrid --sourceparams="loader=grub-efi,image_name=IsoImage" --ondisk cd --label LIVECD
+```
+HEREDOC
+)"
+
+SOURCE_PLUGIN_RAWCOPY_DOC="$(cat <<'HEREDOC'
+## Source plugin: `rawcopy`
+
+Populates a partition by copying a raw image file directly. The source file is specified via `--sourceparams`.
+
+- `--sourceparams="file=<image>.ext4"`: Copy the named image file into the partition.
+
+Common usage:
+
+```
+part / --source rawcopy --sourceparams="file=core-image-minimal.ext4" --ondisk sda
+```
+HEREDOC
+)"
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
@@ -684,6 +815,24 @@ while recv; do
             line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
             character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
+            plugin_name="$(source_value_at "$text" "$line" "$character")" || true
+            if [[ -n "$plugin_name" ]]; then
+                case "$plugin_name" in
+                    rootfs)               send_hover "$id" "$SOURCE_PLUGIN_ROOTFS_DOC" ;;
+                    bootimg_efi)          send_hover "$id" "$SOURCE_PLUGIN_BOOTIMG_EFI_DOC" ;;
+                    bootimg_partition)    send_hover "$id" "$SOURCE_PLUGIN_BOOTIMG_PARTITION_DOC" ;;
+                    bootimg_pcbios)       send_hover "$id" "$SOURCE_PLUGIN_BOOTIMG_PCBIOS_DOC" ;;
+                    bootimg_biosplusefi)  send_hover "$id" "$SOURCE_PLUGIN_BOOTIMG_BIOSPLUSEFI_DOC" ;;
+                    empty)                send_hover "$id" "$SOURCE_PLUGIN_EMPTY_DOC" ;;
+                    extra_partition)      send_hover "$id" "$SOURCE_PLUGIN_EXTRA_PARTITION_DOC" ;;
+                    isoimage_isohybrid)   send_hover "$id" "$SOURCE_PLUGIN_ISOIMAGE_ISOHYBRID_DOC" ;;
+                    rawcopy)              send_hover "$id" "$SOURCE_PLUGIN_RAWCOPY_DOC" ;;
+                    *)
+                        send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
+                        ;;
+                esac
+                continue
+            fi
             word="$(word_at "$text" "$line" "$character")"
             case "$word" in
                 bootloader)             send_hover "$id" "$BOOTLOADER_DOC" ;;
