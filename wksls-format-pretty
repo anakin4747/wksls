@@ -68,6 +68,7 @@ test_result=
 trap update_screen_width WINCH
 
 begin() {
+  _flush_stack
   test_result=
   line_backoff_count=0
   go_to_column 0
@@ -166,46 +167,77 @@ timeout() {
   test_result=timeout
 }
 
-normalize_log_line() {
+# Parse a bats stack trace line into _st_file, _st_lineno, _st_func.
+# Returns 1 if the line is not a stack trace line.
+_parse_stack_line() {
   local line="$1"
-  # Condense bats stack trace lines:
-  #   (from function `foo' in file ./bar/baz, line 42,
-  #   in test file foo.bats, line 7)
-  # into: function foo filepath:linenumber  (or just filepath:linenumber for the call site)
-  if [[ "$line" =~ ^[[:space:]]*[\(\`]*(from[[:space:]]function|in[[:space:]]test[[:space:]]file) ]]; then
-    local file lineno func
-    file="$(printf '%s' "$line" | sed "s/.*in [a-z ]*file \([^,)]*\).*/\1/")"
-    lineno="$(printf '%s' "$line" | sed "s/.*line \([0-9]*\)[,)].*/\1/")"
-    if [[ "$file" != "$line" && "$lineno" != "$line" ]]; then
-      func="$(printf '%s' "$line" | sed "s/.*from function \`\([^']*\)'.*/\1/")"
-      if [[ "$func" != "$line" ]]; then
-        printf 'function %s %s:%s' "$func" "$file" "$lineno"
-      else
-        printf '%s:%s' "$file" "$lineno"
-      fi
-      return
-    fi
+  if [[ ! "$line" =~ ^[[:space:]]*[\(\`]*(from[[:space:]]function|in[[:space:]]test[[:space:]]file) ]]; then
+    return 1
   fi
-  printf '%s' "$line"
+  local file lineno func
+  file="$(printf '%s' "$line" | sed "s/.*in [a-z ]*file \([^,)]*\).*/\1/")"
+  lineno="$(printf '%s' "$line" | sed "s/.*line \([0-9]*\)[,)].*/\1/")"
+  [[ "$file" == "$line" || "$lineno" == "$line" ]] && return 1
+  func="$(printf '%s' "$line" | sed "s/.*from function \`\([^']*\)'.*/\1/")"
+  [[ "$func" == "$line" ]] && func=""
+  _st_file="$(realpath -m "$file" 2>/dev/null || printf '%s' "$file")"
+  _st_lineno="$lineno"
+  _st_func="$func"
+}
+
+# Pending stack trace frames: parallel arrays of file:lineno and funcname.
+_st_locs=()
+_st_funcs=()
+
+# Flush any buffered stack trace lines, aligned as abspath:lineno:funcname.
+_flush_stack() {
+  [[ ${#_st_locs[@]} -eq 0 ]] && return
+  local max_len=0 loc
+  for loc in "${_st_locs[@]}"; do
+    (( ${#loc} > max_len )) && max_len=${#loc}
+  done
+  local i
+  for (( i = 0; i < ${#_st_locs[@]}; i++ )); do
+    loc="${_st_locs[$i]}"
+    local func="${_st_funcs[$i]}"
+    if [[ -n "$func" ]]; then
+      buffer '   %-*s  %s\n' "$max_len" "$loc" "$func"
+    else
+      buffer '   %s\n' "$loc"
+    fi
+  done
+  _st_locs=()
+  _st_funcs=()
 }
 
 log() {
+  local color
   case ${test_result} in
-  pass)
-    clear_color
-    ;;
-  fail)
-    set_color 1
-    ;;
-  timeout)
-    set_color 3
-    ;;
+  pass)    color="" ;;
+  fail)    color=1 ;;
+  timeout) color=3 ;;
   esac
-  buffer '   %s\n' "$(normalize_log_line "$1")"
+
+  local _st_file _st_lineno _st_func
+  if _parse_stack_line "$1"; then
+    _st_locs+=("${_st_file}:${_st_lineno}")
+    _st_funcs+=("$_st_func")
+    return
+  fi
+
+  _flush_stack
+
+  if [[ -n "$color" ]]; then
+    set_color "$color"
+  else
+    clear_color
+  fi
+  buffer '   %s\n' "$1"
   clear_color
 }
 
 summary() {
+  _flush_stack
   if [ "$failures" -eq 0 ]; then
     set_color 2 bold
   else
