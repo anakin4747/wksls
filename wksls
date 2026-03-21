@@ -332,7 +332,7 @@ while recv; do
 
     case "$method" in
         initialize)
-            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true}}}"
+            send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"textDocumentSync\":{\"openClose\":true}}}}"
             ;;
         textDocument/didOpen)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
