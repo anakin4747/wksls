@@ -1,5 +1,6 @@
 {
   "name": "wksls",
+  "publisher": "wksls",
   "displayName": "WKS Language Server",
   "description": "Language support for OpenEmbedded/Yocto Wic Kickstart (.wks) files",
   "version": "0.0.1",
