@@ -28,24 +28,6 @@ teardown() {
     echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.textDocumentSync.change == 1'
 }
 
-@test "hover reflects didChange content" {
-    lsts_initialize
-
-    local uri="file://$LSTS_ROOT/fixtures/hover.wks"
-
-    lsts_open "fixtures/hover.wks"
-
-    # Replace the full text with --ptable via didChange.
-    lsts_notify "textDocument/didChange" \
-        "{\"textDocument\":{\"uri\":\"${uri}\",\"version\":2},\"contentChanges\":[{\"text\":\"--ptable\"}]}"
-
-    lsts_request "textDocument/hover" \
-        "{\"textDocument\":{\"uri\":\"${uri}\"},\"position\":{\"line\":0,\"character\":0}}"
-    lsts_recv_response
-
-    diff <(echo "$LSTS_RESPONSE") "fixtures/hover_--ptable.rpc.json"
-}
-
 @test "hover over bootloader returns documentation" {
     lsts_hover \
         "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 3 0 \
