@@ -1,0 +1,1 @@
+part / --source rawcopy --ondisk sda --size 1024

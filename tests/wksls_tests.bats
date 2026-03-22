@@ -401,25 +401,25 @@ teardown() {
 
 @test "definition on --source bootimg_biosplusefi finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-biosplusefi.wks:1:30" \
+        "oe-fixture/scripts/lib/wic/canned-wks/wksls-biosplusefi.wks:1:30" \
         "fixtures/definition_bootimg_biosplusefi.rpc.json"
 }
 
 @test "definition on --source empty finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-empty.wks:1:19" \
+        "oe-fixture/scripts/lib/wic/canned-wks/wksls-empty.wks:1:19" \
         "fixtures/definition_empty.rpc.json"
 }
 
 @test "definition on --source extra_partition finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-extra-partition.wks:1:24" \
+        "oe-fixture/scripts/lib/wic/canned-wks/wksls-extra-partition.wks:1:24" \
         "fixtures/definition_extra_partition.rpc.json"
 }
 
 @test "definition on --source rawcopy finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-rawcopy.wks:1:20" \
+        "oe-fixture/scripts/lib/wic/canned-wks/wksls-rawcopy.wks:1:20" \
         "fixtures/definition_rawcopy.rpc.json"
 }
 

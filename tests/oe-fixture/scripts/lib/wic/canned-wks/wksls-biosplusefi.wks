@@ -1,0 +1,1 @@
+part /boot --source bootimg_biosplusefi --ondisk sda --label boot --active --align 1024
