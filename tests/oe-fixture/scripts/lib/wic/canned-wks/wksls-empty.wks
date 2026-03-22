@@ -1,0 +1,1 @@
+part / --source empty --ondisk sda --size 1024

@@ -1,0 +1,1 @@
+part / --source extra_partition --ondisk sda --size 1024
