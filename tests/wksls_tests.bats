@@ -30,331 +30,331 @@ teardown() {
 
 @test "hover over bootloader returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 3 0 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:3:0" \
         "fixtures/hover_bootloader.rpc.json"
 }
 
 @test "hover over part returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 2 0 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:2:0" \
         "fixtures/hover_part.rpc.json"
 }
 
 @test "hover over partition returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 0 0 \
+        "fixtures/hover.wks:0:0" \
         "fixtures/hover_part.rpc.json"
 }
 
 @test "hover over --source returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 2 7 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:2:7" \
         "fixtures/hover_--source.rpc.json"
 }
 
 @test "hover over --ondisk returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 2 23 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:2:23" \
         "fixtures/hover_--ondisk.rpc.json"
 }
 
 @test "hover over --fstype returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 2 36 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:2:36" \
         "fixtures/hover_--fstype.rpc.json"
 }
 
 @test "hover over --align returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 2 50 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:2:50" \
         "fixtures/hover_--align.rpc.json"
 }
 
 @test "hover over --ptable returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 3 11 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:3:11" \
         "fixtures/hover_--ptable.rpc.json"
 }
 
 @test "hover over --timeout returns documentation" {
     lsts_hover \
-        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks" 3 24 \
+        "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:3:24" \
         "fixtures/hover_--timeout.rpc.json"
 }
 
 @test "hover over --configfile returns documentation" {
     lsts_hover \
-        "openembedded-core/scripts/lib/wic/canned-wks/directdisk-bootloader-config.wks" 6 11 \
+        "openembedded-core/scripts/lib/wic/canned-wks/directdisk-bootloader-config.wks:6:11" \
         "fixtures/hover_--configfile.rpc.json"
 }
 
 @test "hover over --append returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 9 37 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:9:37" \
         "fixtures/hover_--append.rpc.json"
 }
 
 @test "hover over --size returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/wic/overlayfs_etc.wks.in" 2 32 \
+        "openembedded-core/meta-selftest/wic/overlayfs_etc.wks.in:2:32" \
         "fixtures/hover_--size.rpc.json"
 }
 
 @test "hover over --sourceparams returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/wic/overlayfs_etc.wks.in" 0 62 \
+        "openembedded-core/meta-selftest/wic/overlayfs_etc.wks.in:0:62" \
         "fixtures/hover_--sourceparams.rpc.json"
 }
 
 @test "hover over --label returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 4 48 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:4:48" \
         "fixtures/hover_--label.rpc.json"
 }
 
 @test "hover over --active returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 4 61 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:4:61" \
         "fixtures/hover_--active.rpc.json"
 }
 
 @test "hover over --use-uuid returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 5 80 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:5:80" \
         "fixtures/hover_--use-uuid.rpc.json"
 }
 
 @test "hover over --fsuuid returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 6 128 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:6:128" \
         "fixtures/hover_--fsuuid.rpc.json"
 }
 
 @test "hover over --rootfs-dir returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks" 6 28 \
+        "openembedded-core/meta-selftest/recipes-test/images/wic-image-minimal.wks:6:28" \
         "fixtures/hover_--rootfs-dir.rpc.json"
 }
 
 @test "hover over --part-name returns documentation" {
     lsts_hover \
-        "openembedded-core/meta-selftest/wic/test_gpt_partition_name.wks" 2 19 \
+        "openembedded-core/meta-selftest/wic/test_gpt_partition_name.wks:2:19" \
         "fixtures/hover_--part-name.rpc.json"
 }
 
 @test "hover over --overhead-factor returns documentation" {
     lsts_hover \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 121 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:1:121" \
         "fixtures/hover_--overhead-factor.rpc.json"
 }
 
 @test "hover over --exclude-path returns documentation" {
     lsts_hover \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 2 63 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:2:63" \
         "fixtures/hover_--exclude-path.rpc.json"
 }
 
 @test "hover over --part-type returns documentation" {
     lsts_hover \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in" 1 136 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in:1:136" \
         "fixtures/hover_--part-type.rpc.json"
 }
 
 @test "hover over --fixed-size returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 1 0 \
+        "fixtures/hover.wks:1:0" \
         "fixtures/hover_--fixed-size.rpc.json"
 }
 
 @test "hover over --ondrive returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 2 0 \
+        "fixtures/hover.wks:2:0" \
         "fixtures/hover_--ondrive.rpc.json"
 }
 
 @test "hover over --fsoptions returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 3 0 \
+        "fixtures/hover.wks:3:0" \
         "fixtures/hover_--fsoptions.rpc.json"
 }
 
 @test "hover over --offset returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 4 0 \
+        "fixtures/hover.wks:4:0" \
         "fixtures/hover_--offset.rpc.json"
 }
 
 @test "hover over --no-table returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 5 0 \
+        "fixtures/hover.wks:5:0" \
         "fixtures/hover_--no-table.rpc.json"
 }
 
 @test "hover over --extra-filesystem-space returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 6 0 \
+        "fixtures/hover.wks:6:0" \
         "fixtures/hover_--extra-filesystem-space.rpc.json"
 }
 
 @test "hover over --extra-partition-space returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 7 0 \
+        "fixtures/hover.wks:7:0" \
         "fixtures/hover_--extra-partition-space.rpc.json"
 }
 
 @test "hover over --uuid returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 8 0 \
+        "fixtures/hover.wks:8:0" \
         "fixtures/hover_--uuid.rpc.json"
 }
 
 @test "hover over --system-id returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 9 0 \
+        "fixtures/hover.wks:9:0" \
         "fixtures/hover_--system-id.rpc.json"
 }
 
 @test "hover over --mkfs-extraopts returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 10 0 \
+        "fixtures/hover.wks:10:0" \
         "fixtures/hover_--mkfs-extraopts.rpc.json"
 }
 
 @test "hover over --rootfs returns documentation" {
     lsts_hover \
-        "fixtures/hover.wks" 11 0 \
+        "fixtures/hover.wks:11:0" \
         "fixtures/hover_--rootfs.rpc.json"
 }
 
 @test "hover works when tokens are tab-separated" {
     lsts_hover \
-        "fixtures/hover_tabs.wks" 0 11 \
+        "fixtures/hover_tabs.wks:0:11" \
         "fixtures/hover_--ptable.rpc.json"
 }
 
 @test "hover over --source rootfs value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 0 16 \
+        "fixtures/hover_source_plugins.wks:0:16" \
         "fixtures/hover_source_rootfs.rpc.json"
 }
 
 @test "hover over --source bootimg_efi value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 1 16 \
+        "fixtures/hover_source_plugins.wks:1:16" \
         "fixtures/hover_source_bootimg_efi.rpc.json"
 }
 
 @test "hover over --source bootimg_partition value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 2 16 \
+        "fixtures/hover_source_plugins.wks:2:16" \
         "fixtures/hover_source_bootimg_partition.rpc.json"
 }
 
 @test "hover over --source bootimg_pcbios value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 3 16 \
+        "fixtures/hover_source_plugins.wks:3:16" \
         "fixtures/hover_source_bootimg_pcbios.rpc.json"
 }
 
 @test "hover over --source bootimg_biosplusefi value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 4 16 \
+        "fixtures/hover_source_plugins.wks:4:16" \
         "fixtures/hover_source_bootimg_biosplusefi.rpc.json"
 }
 
 @test "hover over --source empty value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 5 16 \
+        "fixtures/hover_source_plugins.wks:5:16" \
         "fixtures/hover_source_empty.rpc.json"
 }
 
 @test "hover over --source extra_partition value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 6 16 \
+        "fixtures/hover_source_plugins.wks:6:16" \
         "fixtures/hover_source_extra_partition.rpc.json"
 }
 
 @test "hover over --source isoimage_isohybrid value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 7 16 \
+        "fixtures/hover_source_plugins.wks:7:16" \
         "fixtures/hover_source_isoimage_isohybrid.rpc.json"
 }
 
 @test "hover over --source rawcopy value returns plugin documentation" {
     lsts_hover \
-        "fixtures/hover_source_plugins.wks" 8 16 \
+        "fixtures/hover_source_plugins.wks:8:16" \
         "fixtures/hover_source_rawcopy.rpc.json"
 }
 
 @test "completion at line start returns only keywords" {
     lsts_completion \
-        "fixtures/completion_context.wks" 1 0 \
+        "fixtures/completion_context.wks:1:0" \
         "fixtures/completion_keywords.rpc.json"
 }
 
 @test "completion mid-line returns only flags" {
     lsts_completion \
-        "fixtures/completion_context.wks" 0 7 \
+        "fixtures/completion_context.wks:0:7" \
         "fixtures/completion_part_flags.rpc.json"
 }
 
 @test "completion after --fstype= returns fstype values" {
     lsts_completion \
-        "fixtures/completion.wks" 0 10 \
+        "fixtures/completion.wks:0:10" \
         "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= returns ptable values" {
     lsts_completion \
-        "fixtures/completion.wks" 1 10 \
+        "fixtures/completion.wks:1:10" \
         "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion after --fstype= with no value typed returns fstype values" {
     lsts_completion \
-        "fixtures/completion_empty_value.wks" 0 32 \
+        "fixtures/completion_empty_value.wks:0:32" \
         "fixtures/completion_--fstype.rpc.json"
 }
 
 @test "completion after --ptable= with no value typed returns ptable values" {
     lsts_completion \
-        "fixtures/completion_empty_value.wks" 1 20 \
+        "fixtures/completion_empty_value.wks:1:20" \
         "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion at char 0 on non-empty line returns only keywords" {
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:0:0" \
         "fixtures/completion_keywords.rpc.json"
 }
 
 @test "completion after space-separated --ptable returns ptable values" {
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 19 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:0:19" \
         "fixtures/completion_--ptable.rpc.json"
 }
 
 @test "completion after space-separated --source returns source plugin values" {
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:1:20" \
         "fixtures/completion_--source.rpc.json"
 }
 
 @test "completion mid-line on bootloader line returns only bootloader flags" {
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 11 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:0:11" \
         "fixtures/completion_bootloader_flags.rpc.json"
 }
 
 @test "completion mid-line on part line returns only part flags" {
     lsts_completion \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 11 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:1:11" \
         "fixtures/completion_part_flags.rpc.json"
 }
 
 @test "completion with partial keyword prefix returns only keywords" {
     lsts_completion \
-        "fixtures/completion_partial_keyword.wks" 0 2 \
+        "fixtures/completion_partial_keyword.wks:0:2" \
         "fixtures/completion_keywords.rpc.json"
 }
 
@@ -365,61 +365,61 @@ teardown() {
 
 @test "definition on --source value finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 1 20 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:1:20" \
         "fixtures/definition_rootfs.rpc.json"
 }
 
 @test "definition on non-source token returns null" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in" 0 0 \
+        "openembedded-core/scripts/lib/wic/canned-wks/efi-bootdisk.wks.in:0:0" \
         "fixtures/definition_null.rpc.json"
 }
 
 @test "definition on --source bootimg_efi finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/mkefidisk.wks" 4 25 \
+        "openembedded-core/scripts/lib/wic/canned-wks/mkefidisk.wks:4:25" \
         "fixtures/definition_bootimg_efi.rpc.json"
 }
 
 @test "definition on --source bootimg_partition finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/sdimage-bootpart.wks" 4 28 \
+        "openembedded-core/scripts/lib/wic/canned-wks/sdimage-bootpart.wks:4:28" \
         "fixtures/definition_bootimg_partition.rpc.json"
 }
 
 @test "definition on --source bootimg_pcbios finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks" 5 27 \
+        "openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks:5:27" \
         "fixtures/definition_bootimg_pcbios.rpc.json"
 }
 
 @test "definition on --source isoimage_isohybrid finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/mkhybridiso.wks" 4 29 \
+        "openembedded-core/scripts/lib/wic/canned-wks/mkhybridiso.wks:4:29" \
         "fixtures/definition_isoimage_isohybrid.rpc.json"
 }
 
 @test "definition on --source bootimg_biosplusefi finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-biosplusefi.wks" 0 29 \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-biosplusefi.wks:0:29" \
         "fixtures/definition_bootimg_biosplusefi.rpc.json"
 }
 
 @test "definition on --source empty finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-empty.wks" 0 18 \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-empty.wks:0:18" \
         "fixtures/definition_empty.rpc.json"
 }
 
 @test "definition on --source extra_partition finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-extra-partition.wks" 0 23 \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-extra-partition.wks:0:23" \
         "fixtures/definition_extra_partition.rpc.json"
 }
 
 @test "definition on --source rawcopy finds plugin source file" {
     lsts_definition \
-        "openembedded-core/scripts/lib/wic/canned-wks/wksls-rawcopy.wks" 0 19 \
+        "openembedded-core/scripts/lib/wic/canned-wks/wksls-rawcopy.wks:0:19" \
         "fixtures/definition_rawcopy.rpc.json"
 }
 
