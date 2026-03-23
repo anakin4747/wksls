@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_unknown_flag.wks","diagnostics":[{"range":{"start":{"line":0,"character":7},"end":{"line":0,"character":17}},"severity":1,"message":"Unknown flag for part: --notaflag"}]}}
