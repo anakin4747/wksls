@@ -789,32 +789,81 @@ _append_diagnostic() {
         }]'
 }
 
+# Validate a single enumerated flag value (--fstype or --ptable).
+# Updates the global `diagnostics` variable.
+# Usage: _validate_enum_value <lineno> <line_text> <flag_name> <value> <tok>
+_validate_enum_value() {
+    local lineno="$1" line_text="$2" flag_name="$3" value="$4" tok="$5"
+    local col_start valid_list msg
+    case "$flag_name" in
+        --fstype) valid_list="$FSTYPE_VALUES" ; msg="Invalid --fstype value: $value" ;;
+        --ptable) valid_list="$PTABLE_VALUES" ; msg="Invalid --ptable value: $value" ;;
+        *) return ;;
+    esac
+    _in_list "$value" "$valid_list" && return
+    col_start="$(_token_offset "$line_text" "$tok")"
+    diagnostics="$(_append_diagnostic "$diagnostics" \
+        "$lineno" "$col_start" $((col_start + ${#tok})) "$msg")"
+}
+
+# Validate one token from a directive line.
+# Updates the globals `diagnostics` and `prev_flag`.
+# Usage: _validate_token <lineno> <line_text> <directive> <valid_flags> <tok>
+_validate_token() {
+    local lineno="$1" line_text="$2" directive="$3" valid_flags="$4" tok="$5"
+    local col_start flag_name flag_value
+
+    if [[ -n "$prev_flag" && "$tok" != --* ]]; then
+        _validate_enum_value "$lineno" "$line_text" "$prev_flag" "$tok" "$tok"
+        prev_flag=""
+        return
+    fi
+    prev_flag=""
+
+    [[ "$tok" == --* ]] || return
+
+    flag_name="${tok%%=*}"
+    flag_value="${tok#*=}"
+    [[ "$flag_name" == "$tok" ]] && flag_value=""
+
+    col_start="$(_token_offset "$line_text" "$tok")"
+    if ! _in_list "$flag_name" "$valid_flags"; then
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "Unknown flag for $directive: $flag_name")"
+        return
+    fi
+
+    if [[ -n "$flag_value" ]]; then
+        _validate_enum_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
+    else
+        case "$flag_name" in
+            --fstype|--ptable) prev_flag="$flag_name" ;;
+        esac
+    fi
+}
+
 # Validate document text and print a JSON array of LSP diagnostic objects.
 # Each diagnostic has: range, severity (1=Error), message.
 validate_document() {
     local text="$1"
     local lineno=0
-    local diagnostics="[]"
-    local line_text directive
+    local line_text directive stripped valid_flags
+    diagnostics="[]"
 
     while IFS= read -r line_text; do
         line_text="${line_text%$'\r'}"
 
-        # Skip blank lines and comment lines.
-        local stripped="${line_text%%#*}"
+        stripped="${line_text%%#*}"
         stripped="${stripped#"${stripped%%[![:space:]]*}"}"  # ltrim
         stripped="${stripped%"${stripped##*[![:space:]]}"}"  # rtrim
-        if [[ -z "$stripped" ]]; then
-            lineno=$((lineno + 1))
-            continue
-        fi
+        [[ -z "$stripped" ]] && { lineno=$((lineno + 1)); continue; }
 
         read -ra tokens <<< "$stripped"
         directive="${tokens[0]}"
 
         case "$directive" in
-            bootloader|part|partition|include)
-                ;;
+            bootloader|part|partition|include) ;;
             *)
                 local col_start
                 col_start="$(_token_offset "$line_text" "$directive")"
@@ -826,7 +875,6 @@ validate_document() {
                 ;;
         esac
 
-        local valid_flags=""
         case "$directive" in
             bootloader)     valid_flags="$BOOTLOADER_FLAGS" ;;
             part|partition) valid_flags="$PART_FLAGS" ;;
@@ -835,72 +883,7 @@ validate_document() {
 
         local i=1 prev_flag=""
         while [[ $i -lt ${#tokens[@]} ]]; do
-            local tok="${tokens[$i]}"
-
-            # Consume a space-separated value for the previous enumerated flag.
-            if [[ -n "$prev_flag" && "$tok" != --* ]]; then
-                local col_start
-                col_start="$(_token_offset "$line_text" "$tok")"
-                case "$prev_flag" in
-                    --fstype)
-                        _in_list "$tok" "$FSTYPE_VALUES" || \
-                            diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" $((col_start + ${#tok})) \
-                                "Invalid --fstype value: $tok")"
-                        ;;
-                    --ptable)
-                        _in_list "$tok" "$PTABLE_VALUES" || \
-                            diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" $((col_start + ${#tok})) \
-                                "Invalid --ptable value: $tok")"
-                        ;;
-                esac
-                prev_flag=""
-                i=$((i + 1))
-                continue
-            fi
-            prev_flag=""
-
-            # Skip non-flag tokens (e.g. mount points like "/").
-            [[ "$tok" == --* ]] || { i=$((i + 1)); continue; }
-
-            local flag_name="${tok%%=*}"
-            local flag_value="${tok#*=}"
-            [[ "$flag_name" == "$tok" ]] && flag_value=""
-
-            local col_start
-            col_start="$(_token_offset "$line_text" "$tok")"
-
-            if ! _in_list "$flag_name" "$valid_flags"; then
-                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                    "$col_start" $((col_start + ${#tok})) \
-                    "Unknown flag for $directive: $flag_name")"
-                i=$((i + 1))
-                continue
-            fi
-
-            # Validate enumerated flag values.
-            if [[ -n "$flag_value" ]]; then
-                case "$flag_name" in
-                    --fstype)
-                        _in_list "$flag_value" "$FSTYPE_VALUES" || \
-                            diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" $((col_start + ${#tok})) \
-                                "Invalid --fstype value: $flag_value")"
-                        ;;
-                    --ptable)
-                        _in_list "$flag_value" "$PTABLE_VALUES" || \
-                            diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" $((col_start + ${#tok})) \
-                                "Invalid --ptable value: $flag_value")"
-                        ;;
-                esac
-            else
-                case "$flag_name" in
-                    --fstype|--ptable) prev_flag="$flag_name" ;;
-                esac
-            fi
-
+            _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" "${tokens[$i]}"
             i=$((i + 1))
         done
 
