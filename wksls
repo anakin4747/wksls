@@ -798,7 +798,6 @@ validate_document() {
     local line_text directive
 
     while IFS= read -r line_text; do
-        # Strip trailing carriage return.
         line_text="${line_text%$'\r'}"
 
         # Skip blank lines and comment lines.
@@ -810,58 +809,50 @@ validate_document() {
             continue
         fi
 
-        # Extract all whitespace-delimited tokens.
         read -ra tokens <<< "$stripped"
         directive="${tokens[0]}"
 
-        # Check directive validity.
         case "$directive" in
             bootloader|part|partition|include)
                 ;;
             *)
-                local col_start col_end
+                local col_start
                 col_start="$(_token_offset "$line_text" "$directive")"
-                col_end=$((col_start + ${#directive}))
                 diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                    "$col_start" "$col_end" "Unknown directive: $directive")"
+                    "$col_start" $((col_start + ${#directive})) \
+                    "Unknown directive: $directive")"
                 lineno=$((lineno + 1))
                 continue
                 ;;
         esac
 
-        # Determine valid flags for this directive.
         local valid_flags=""
         case "$directive" in
-            bootloader)        valid_flags="$BOOTLOADER_FLAGS" ;;
-            part|partition)    valid_flags="$PART_FLAGS" ;;
-            include)           lineno=$((lineno + 1)); continue ;;
+            bootloader)     valid_flags="$BOOTLOADER_FLAGS" ;;
+            part|partition) valid_flags="$PART_FLAGS" ;;
+            include)        lineno=$((lineno + 1)); continue ;;
         esac
 
-        # Validate flags and their values in the token stream.
-        local i=1
-        local prev_flag=""
+        local i=1 prev_flag=""
         while [[ $i -lt ${#tokens[@]} ]]; do
             local tok="${tokens[$i]}"
 
-            # Handle prev_flag needing a space-separated value.
+            # Consume a space-separated value for the previous enumerated flag.
             if [[ -n "$prev_flag" && "$tok" != --* ]]; then
-                local col_start col_end
+                local col_start
                 col_start="$(_token_offset "$line_text" "$tok")"
-                col_end=$((col_start + ${#tok}))
                 case "$prev_flag" in
                     --fstype)
-                        if ! _in_list "$tok" "$FSTYPE_VALUES"; then
+                        _in_list "$tok" "$FSTYPE_VALUES" || \
                             diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" "$col_end" \
+                                "$lineno" "$col_start" $((col_start + ${#tok})) \
                                 "Invalid --fstype value: $tok")"
-                        fi
                         ;;
                     --ptable)
-                        if ! _in_list "$tok" "$PTABLE_VALUES"; then
+                        _in_list "$tok" "$PTABLE_VALUES" || \
                             diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" "$col_end" \
+                                "$lineno" "$col_start" $((col_start + ${#tok})) \
                                 "Invalid --ptable value: $tok")"
-                        fi
                         ;;
                 esac
                 prev_flag=""
@@ -870,25 +861,19 @@ validate_document() {
             fi
             prev_flag=""
 
-            # Extract flag name (strip any =value suffix).
+            # Skip non-flag tokens (e.g. mount points like "/").
+            [[ "$tok" == --* ]] || { i=$((i + 1)); continue; }
+
             local flag_name="${tok%%=*}"
             local flag_value="${tok#*=}"
             [[ "$flag_name" == "$tok" ]] && flag_value=""
 
-            # Skip tokens that are not flags (e.g. mount points like "/").
-            if [[ "$tok" != --* ]]; then
-                i=$((i + 1))
-                continue
-            fi
-
-            local col_start col_end
+            local col_start
             col_start="$(_token_offset "$line_text" "$tok")"
-            col_end=$((col_start + ${#tok}))
 
-            # Check flag is valid for this directive.
             if ! _in_list "$flag_name" "$valid_flags"; then
                 diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                    "$col_start" "$col_end" \
+                    "$col_start" $((col_start + ${#tok})) \
                     "Unknown flag for $directive: $flag_name")"
                 i=$((i + 1))
                 continue
@@ -896,29 +881,23 @@ validate_document() {
 
             # Validate enumerated flag values.
             if [[ -n "$flag_value" ]]; then
-                # Inline =value form (e.g. --fstype=ext4).
                 case "$flag_name" in
                     --fstype)
-                        if ! _in_list "$flag_value" "$FSTYPE_VALUES"; then
+                        _in_list "$flag_value" "$FSTYPE_VALUES" || \
                             diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" "$col_end" \
+                                "$lineno" "$col_start" $((col_start + ${#tok})) \
                                 "Invalid --fstype value: $flag_value")"
-                        fi
                         ;;
                     --ptable)
-                        if ! _in_list "$flag_value" "$PTABLE_VALUES"; then
+                        _in_list "$flag_value" "$PTABLE_VALUES" || \
                             diagnostics="$(_append_diagnostic "$diagnostics" \
-                                "$lineno" "$col_start" "$col_end" \
+                                "$lineno" "$col_start" $((col_start + ${#tok})) \
                                 "Invalid --ptable value: $flag_value")"
-                        fi
                         ;;
                 esac
             else
-                # Space-separated value form — remember flag for next token.
                 case "$flag_name" in
-                    --fstype|--ptable)
-                        prev_flag="$flag_name"
-                        ;;
+                    --fstype|--ptable) prev_flag="$flag_name" ;;
                 esac
             fi
 
@@ -939,64 +918,69 @@ publish_diagnostics() {
     send "{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{\"uri\":${uri_json},\"diagnostics\":${diagnostics}}}"
 }
 
+# Parse common request fields from $BODY into named variables.
+# Sets: method, id, uri, line, character (all from the current message).
+parse_request() {
+    local parsed
+    parsed="$(printf '%s' "$BODY" | jq -r '
+        (.method // ""),
+        (.id // ""),
+        (.params.textDocument.uri // ""),
+        (.params.position.line // ""),
+        (.params.position.character // "")
+    ')"
+    { IFS= read -r method
+      IFS= read -r id
+      IFS= read -r uri
+      IFS= read -r line
+      IFS= read -r character
+    } <<< "$parsed" || :
+}
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
 while recv; do
-    method="$(printf '%s' "$BODY" | jq -r '.method // empty')"
-    id="$(printf '%s' "$BODY" | jq -r '.id // empty')"
+    parse_request
 
     case "$method" in
         initialize)
             send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"capabilities\":{\"hoverProvider\":true,\"completionProvider\":{},\"definitionProvider\":true,\"textDocumentSync\":{\"openClose\":true,\"change\":1}}}}"
             ;;
         textDocument/didOpen)
-            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             text="$(printf '%s' "$BODY" | jq -r '.params.textDocument.text')"
             DOC_TEXT["$uri"]="$text"
             publish_diagnostics "$uri" "$(validate_document "$text")"
             ;;
         textDocument/didChange)
-            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             text="$(printf '%s' "$BODY" | jq -r '.params.contentChanges[-1].text')"
             DOC_TEXT["$uri"]="$text"
             publish_diagnostics "$uri" "$(validate_document "$text")"
             ;;
         textDocument/completion)
-            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
-            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
-            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
             flag="$(flag_at "$text" "$line" "$character")"
-            if [[ -z "$flag" ]]; then
-                flag="$(prev_flag_at "$text" "$line" "$character")"
-            fi
+            [[ -z "$flag" ]] && flag="$(prev_flag_at "$text" "$line" "$character")"
             if [[ -n "$flag" ]]; then
                 send_completion "$id" "$flag"
             elif line_start_at "$text" "$line" "$character"; then
                 send_completion "$id" "keywords"
-            elif [[ "$(directive_at "$text" "$line")" == "" ]]; then
-                send_completion "$id" "keywords"
             else
                 case "$(directive_at "$text" "$line")" in
                     bootloader) send_completion "$id" "bootloader_flags" ;;
+                    "")         send_completion "$id" "keywords" ;;
                     *)          send_completion "$id" "part_flags" ;;
                 esac
             fi
             ;;
         textDocument/definition)
-            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
-            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
-            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
             target=""
             plugin_name="$(source_value_at "$text" "$line" "$character")" || true
             if [[ -n "$plugin_name" ]]; then
                 local_path="${uri#file://}"
                 oe_root="$(find_oe_root "$local_path")" || true
-                if [[ -n "$oe_root" ]]; then
-                    target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
-                fi
+                [[ -n "$oe_root" ]] && target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
             fi
             if [[ -n "$target" ]]; then
                 target_uri="file://${target}"
@@ -1009,9 +993,6 @@ while recv; do
             fi
             ;;
         textDocument/hover)
-            uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
-            line="$(printf '%s' "$BODY" | jq -r '.params.position.line')"
-            character="$(printf '%s' "$BODY" | jq -r '.params.position.character')"
             text="${DOC_TEXT["$uri"]:-}"
             plugin_name="$(source_value_at "$text" "$line" "$character")" || true
             if [[ -n "$plugin_name" ]]; then
@@ -1025,48 +1006,43 @@ while recv; do
                     extra_partition)      send_hover "$id" "$SOURCE_PLUGIN_EXTRA_PARTITION_DOC" ;;
                     isoimage_isohybrid)   send_hover "$id" "$SOURCE_PLUGIN_ISOIMAGE_ISOHYBRID_DOC" ;;
                     rawcopy)              send_hover "$id" "$SOURCE_PLUGIN_RAWCOPY_DOC" ;;
-                    *)
-                        send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
-                        ;;
+                    *)                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}" ;;
                 esac
                 continue
             fi
-            word="$(word_at "$text" "$line" "$character")"
-            case "$word" in
-                bootloader)             send_hover "$id" "$BOOTLOADER_DOC" ;;
-                part|partition)         send_hover "$id" "$PART_DOC" ;;
-                --append)               send_hover "$id" "$APPEND_DOC" ;;
-                --configfile)           send_hover "$id" "$CONFIGFILE_DOC" ;;
-                --ptable)               send_hover "$id" "$PTABLE_DOC" ;;
-                --timeout)              send_hover "$id" "$TIMEOUT_DOC" ;;
-                --size)                 send_hover "$id" "$SIZE_DOC" ;;
-                --fixed-size)           send_hover "$id" "$FIXED_SIZE_DOC" ;;
-                --source)               send_hover "$id" "$SOURCE_DOC" ;;
-                --sourceparams)         send_hover "$id" "$SOURCEPARAMS_DOC" ;;
-                --ondisk|--ondrive)     send_hover "$id" "$ONDISK_DOC" ;;
-                --fstype)               send_hover "$id" "$FSTYPE_DOC" ;;
-                --fsoptions)            send_hover "$id" "$FSOPTIONS_DOC" ;;
-                --label)                send_hover "$id" "$LABEL_DOC" ;;
-                --active)               send_hover "$id" "$ACTIVE_DOC" ;;
-                --align)                send_hover "$id" "$ALIGN_DOC" ;;
-                --offset)               send_hover "$id" "$OFFSET_DOC" ;;
-                --no-table)             send_hover "$id" "$NO_TABLE_DOC" ;;
-                --exclude-path)         send_hover "$id" "$EXCLUDE_PATH_DOC" ;;
+            case "$(word_at "$text" "$line" "$character")" in
+                bootloader)               send_hover "$id" "$BOOTLOADER_DOC" ;;
+                part|partition)           send_hover "$id" "$PART_DOC" ;;
+                --append)                 send_hover "$id" "$APPEND_DOC" ;;
+                --configfile)             send_hover "$id" "$CONFIGFILE_DOC" ;;
+                --ptable)                 send_hover "$id" "$PTABLE_DOC" ;;
+                --timeout)                send_hover "$id" "$TIMEOUT_DOC" ;;
+                --size)                   send_hover "$id" "$SIZE_DOC" ;;
+                --fixed-size)             send_hover "$id" "$FIXED_SIZE_DOC" ;;
+                --source)                 send_hover "$id" "$SOURCE_DOC" ;;
+                --sourceparams)           send_hover "$id" "$SOURCEPARAMS_DOC" ;;
+                --ondisk|--ondrive)       send_hover "$id" "$ONDISK_DOC" ;;
+                --fstype)                 send_hover "$id" "$FSTYPE_DOC" ;;
+                --fsoptions)              send_hover "$id" "$FSOPTIONS_DOC" ;;
+                --label)                  send_hover "$id" "$LABEL_DOC" ;;
+                --active)                 send_hover "$id" "$ACTIVE_DOC" ;;
+                --align)                  send_hover "$id" "$ALIGN_DOC" ;;
+                --offset)                 send_hover "$id" "$OFFSET_DOC" ;;
+                --no-table)               send_hover "$id" "$NO_TABLE_DOC" ;;
+                --exclude-path)           send_hover "$id" "$EXCLUDE_PATH_DOC" ;;
                 --extra-filesystem-space) send_hover "$id" "$EXTRA_FILESYSTEM_SPACE_DOC" ;;
                 --extra-partition-space)  send_hover "$id" "$EXTRA_PARTITION_SPACE_DOC" ;;
-                --overhead-factor)      send_hover "$id" "$OVERHEAD_FACTOR_DOC" ;;
-                --part-name)            send_hover "$id" "$PART_NAME_DOC" ;;
-                --part-type)            send_hover "$id" "$PART_TYPE_DOC" ;;
-                --use-uuid)             send_hover "$id" "$USE_UUID_DOC" ;;
-                --uuid)                 send_hover "$id" "$UUID_DOC" ;;
-                --fsuuid)               send_hover "$id" "$FSUUID_DOC" ;;
-                --system-id)            send_hover "$id" "$SYSTEM_ID_DOC" ;;
-                --mkfs-extraopts)       send_hover "$id" "$MKFS_EXTRAOPTS_DOC" ;;
-                --rootfs-dir)           send_hover "$id" "$ROOTFS_DIR_DOC" ;;
-                --rootfs)               send_hover "$id" "$ROOTFS_DOC" ;;
-                *)
-                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
-                    ;;
+                --overhead-factor)        send_hover "$id" "$OVERHEAD_FACTOR_DOC" ;;
+                --part-name)              send_hover "$id" "$PART_NAME_DOC" ;;
+                --part-type)              send_hover "$id" "$PART_TYPE_DOC" ;;
+                --use-uuid)               send_hover "$id" "$USE_UUID_DOC" ;;
+                --uuid)                   send_hover "$id" "$UUID_DOC" ;;
+                --fsuuid)                 send_hover "$id" "$FSUUID_DOC" ;;
+                --system-id)              send_hover "$id" "$SYSTEM_ID_DOC" ;;
+                --mkfs-extraopts)         send_hover "$id" "$MKFS_EXTRAOPTS_DOC" ;;
+                --rootfs-dir)             send_hover "$id" "$ROOTFS_DIR_DOC" ;;
+                --rootfs)                 send_hover "$id" "$ROOTFS_DOC" ;;
+                *)                        send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}" ;;
             esac
             ;;
         exit)
