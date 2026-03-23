@@ -423,6 +423,64 @@ teardown() {
         "fixtures/definition_rawcopy.rpc.json"
 }
 
+@test "diagnostics on valid document publishes empty diagnostics" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_valid.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_valid.rpc.json"
+}
+
+@test "diagnostics on unknown directive reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_unknown_directive.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_unknown_directive.rpc.json"
+}
+
+@test "diagnostics on unknown flag reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_unknown_flag.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_unknown_flag.rpc.json"
+}
+
+@test "diagnostics on invalid --fstype value reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_invalid_fstype.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_invalid_fstype.rpc.json"
+}
+
+@test "diagnostics on invalid --ptable value reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_invalid_ptable.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_invalid_ptable.rpc.json"
+}
+
+@test "diagnostics update on didChange" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_valid.wks"
+    lsts_recv
+    local uri="file://$LSTS_ROOT/fixtures/diagnostics_valid.wks"
+    local new_text
+    new_text="$(jq -Rs . <"$LSTS_ROOT/fixtures/diagnostics_unknown_directive.wks")"
+    lsts_notify "textDocument/didChange" \
+        "{\"textDocument\":{\"uri\":\"${uri}\",\"version\":2},\"contentChanges\":[{\"text\":${new_text}}]}"
+    lsts_recv
+    _lsts_normalize
+    echo "$LSTS_RESPONSE" | jq -e \
+        '.method == "textDocument/publishDiagnostics"
+        and (.params.diagnostics | length) == 1
+        and .params.diagnostics[0].severity == 1
+        and (.params.diagnostics[0].message | contains("blah"))'
+}
+
 @test "fails to start when jq is not installed" {
     local bash_dir wksls_src
     bash_dir="$(dirname "$(command -v bash)")"
