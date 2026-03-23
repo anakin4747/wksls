@@ -901,7 +901,6 @@ publish_diagnostics() {
     send "{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{\"uri\":${uri_json},\"diagnostics\":${diagnostics}}}"
 }
 
-# Parse common request fields from $BODY into named variables.
 handle_completion() {
     local id="$1" text="$2" line="$3" character="$4"
     local flag directive
@@ -925,9 +924,8 @@ handle_completion() {
 
 handle_definition() {
     local id="$1" text="$2" line="$3" character="$4" uri="$5"
-    local plugin_name local_path oe_root target target_uri class_pos class_line class_char
+    local plugin_name local_path oe_root target="" target_uri class_pos class_line class_char
     plugin_name="$(source_value_at "$text" "$line" "$character")" || true
-    target=""
     if [[ -n "$plugin_name" ]]; then
         local_path="${uri#file://}"
         oe_root="$(find_oe_root "$local_path")" || true
