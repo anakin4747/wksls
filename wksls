@@ -743,6 +743,202 @@ part / --source rawcopy --sourceparams="file=core-image-minimal.ext4" --ondisk s
 HEREDOC
 )"
 
+# Valid flags for each directive.
+BOOTLOADER_FLAGS="--append --configfile --ptable --timeout"
+PART_FLAGS="--active --align --exclude-path --extra-filesystem-space --extra-partition-space --fixed-size --fsoptions --fstype --fsuuid --label --mkfs-extraopts --no-table --offset --ondisk --ondrive --overhead-factor --part-name --part-type --rootfs --rootfs-dir --size --source --sourceparams --system-id --use-uuid --uuid"
+
+# Valid values for enumerated flags.
+FSTYPE_VALUES="btrfs efi erofs ext2 ext3 ext4 msdos squashfs swap vfat"
+PTABLE_VALUES="gpt msdos"
+
+# Return 0 if the given word is present in the given space-separated list.
+_in_list() {
+    local word="$1" list="$2" item
+    for item in $list; do
+        [[ "$item" == "$word" ]] && return 0
+    done
+    return 1
+}
+
+# Return the 0-based character offset of the first occurrence of the token
+# in the given line text, or -1 if not found.
+_token_offset() {
+    local line_text="$1" token="$2"
+    local before="${line_text%%"$token"*}"
+    [[ "$before" == "$line_text" ]] && { printf '%d' -1; return; }
+    printf '%d' "${#before}"
+}
+
+# Append one LSP diagnostic object to a JSON array.
+# Usage: _append_diagnostic <diags-json> <line> <col-start> <col-end> <message>
+# Prints the updated array.
+_append_diagnostic() {
+    local diags="$1" lineno="$2" col_start="$3" col_end="$4" msg="$5"
+    jq -cn \
+        --argjson diags "$diags" \
+        --argjson sl "$lineno" --argjson sc "$col_start" \
+        --argjson el "$lineno" --argjson ec "$col_end" \
+        --arg msg "$msg" \
+        '$diags + [{
+            range: {
+                start: {line: $sl, character: $sc},
+                end:   {line: $el, character: $ec}
+            },
+            severity: 1,
+            message: $msg
+        }]'
+}
+
+# Validate document text and print a JSON array of LSP diagnostic objects.
+# Each diagnostic has: range, severity (1=Error), message.
+validate_document() {
+    local text="$1"
+    local lineno=0
+    local diagnostics="[]"
+    local line_text directive
+
+    while IFS= read -r line_text; do
+        # Strip trailing carriage return.
+        line_text="${line_text%$'\r'}"
+
+        # Skip blank lines and comment lines.
+        local stripped="${line_text%%#*}"
+        stripped="${stripped#"${stripped%%[![:space:]]*}"}"  # ltrim
+        stripped="${stripped%"${stripped##*[![:space:]]}"}"  # rtrim
+        if [[ -z "$stripped" ]]; then
+            lineno=$((lineno + 1))
+            continue
+        fi
+
+        # Extract all whitespace-delimited tokens.
+        read -ra tokens <<< "$stripped"
+        directive="${tokens[0]}"
+
+        # Check directive validity.
+        case "$directive" in
+            bootloader|part|partition|include)
+                ;;
+            *)
+                local col_start col_end
+                col_start="$(_token_offset "$line_text" "$directive")"
+                col_end=$((col_start + ${#directive}))
+                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                    "$col_start" "$col_end" "Unknown directive: $directive")"
+                lineno=$((lineno + 1))
+                continue
+                ;;
+        esac
+
+        # Determine valid flags for this directive.
+        local valid_flags=""
+        case "$directive" in
+            bootloader)        valid_flags="$BOOTLOADER_FLAGS" ;;
+            part|partition)    valid_flags="$PART_FLAGS" ;;
+            include)           lineno=$((lineno + 1)); continue ;;
+        esac
+
+        # Validate flags and their values in the token stream.
+        local i=1
+        local prev_flag=""
+        while [[ $i -lt ${#tokens[@]} ]]; do
+            local tok="${tokens[$i]}"
+
+            # Handle prev_flag needing a space-separated value.
+            if [[ -n "$prev_flag" && "$tok" != --* ]]; then
+                local col_start col_end
+                col_start="$(_token_offset "$line_text" "$tok")"
+                col_end=$((col_start + ${#tok}))
+                case "$prev_flag" in
+                    --fstype)
+                        if ! _in_list "$tok" "$FSTYPE_VALUES"; then
+                            diagnostics="$(_append_diagnostic "$diagnostics" \
+                                "$lineno" "$col_start" "$col_end" \
+                                "Invalid --fstype value: $tok")"
+                        fi
+                        ;;
+                    --ptable)
+                        if ! _in_list "$tok" "$PTABLE_VALUES"; then
+                            diagnostics="$(_append_diagnostic "$diagnostics" \
+                                "$lineno" "$col_start" "$col_end" \
+                                "Invalid --ptable value: $tok")"
+                        fi
+                        ;;
+                esac
+                prev_flag=""
+                i=$((i + 1))
+                continue
+            fi
+            prev_flag=""
+
+            # Extract flag name (strip any =value suffix).
+            local flag_name="${tok%%=*}"
+            local flag_value="${tok#*=}"
+            [[ "$flag_name" == "$tok" ]] && flag_value=""
+
+            # Skip tokens that are not flags (e.g. mount points like "/").
+            if [[ "$tok" != --* ]]; then
+                i=$((i + 1))
+                continue
+            fi
+
+            local col_start col_end
+            col_start="$(_token_offset "$line_text" "$tok")"
+            col_end=$((col_start + ${#tok}))
+
+            # Check flag is valid for this directive.
+            if ! _in_list "$flag_name" "$valid_flags"; then
+                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                    "$col_start" "$col_end" \
+                    "Unknown flag for $directive: $flag_name")"
+                i=$((i + 1))
+                continue
+            fi
+
+            # Validate enumerated flag values.
+            if [[ -n "$flag_value" ]]; then
+                # Inline =value form (e.g. --fstype=ext4).
+                case "$flag_name" in
+                    --fstype)
+                        if ! _in_list "$flag_value" "$FSTYPE_VALUES"; then
+                            diagnostics="$(_append_diagnostic "$diagnostics" \
+                                "$lineno" "$col_start" "$col_end" \
+                                "Invalid --fstype value: $flag_value")"
+                        fi
+                        ;;
+                    --ptable)
+                        if ! _in_list "$flag_value" "$PTABLE_VALUES"; then
+                            diagnostics="$(_append_diagnostic "$diagnostics" \
+                                "$lineno" "$col_start" "$col_end" \
+                                "Invalid --ptable value: $flag_value")"
+                        fi
+                        ;;
+                esac
+            else
+                # Space-separated value form — remember flag for next token.
+                case "$flag_name" in
+                    --fstype|--ptable)
+                        prev_flag="$flag_name"
+                        ;;
+                esac
+            fi
+
+            i=$((i + 1))
+        done
+
+        lineno=$((lineno + 1))
+    done < <(printf '%s\n' "$text")
+
+    printf '%s' "$diagnostics"
+}
+
+# Send a textDocument/publishDiagnostics notification.
+publish_diagnostics() {
+    local uri="$1" diagnostics="$2"
+    local uri_json
+    uri_json="$(jq -cn --arg u "$uri" '$u')"
+    send "{\"jsonrpc\":\"2.0\",\"method\":\"textDocument/publishDiagnostics\",\"params\":{\"uri\":${uri_json},\"diagnostics\":${diagnostics}}}"
+}
+
 # Associative array mapping URI -> document text.
 declare -A DOC_TEXT
 
@@ -758,11 +954,13 @@ while recv; do
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             text="$(printf '%s' "$BODY" | jq -r '.params.textDocument.text')"
             DOC_TEXT["$uri"]="$text"
+            publish_diagnostics "$uri" "$(validate_document "$text")"
             ;;
         textDocument/didChange)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"
             text="$(printf '%s' "$BODY" | jq -r '.params.contentChanges[-1].text')"
             DOC_TEXT["$uri"]="$text"
+            publish_diagnostics "$uri" "$(validate_document "$text")"
             ;;
         textDocument/completion)
             uri="$(printf '%s' "$BODY" | jq -r '.params.textDocument.uri')"

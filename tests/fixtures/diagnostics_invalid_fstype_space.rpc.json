@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_invalid_fstype_space.wks","diagnostics":[{"range":{"start":{"line":0,"character":32},"end":{"line":0,"character":37}},"severity":1,"message":"Invalid --fstype value: badfs"}]}}

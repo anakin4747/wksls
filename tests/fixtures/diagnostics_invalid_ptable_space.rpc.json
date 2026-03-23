@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_invalid_ptable_space.wks","diagnostics":[{"range":{"start":{"line":0,"character":20},"end":{"line":0,"character":29}},"severity":1,"message":"Invalid --ptable value: badptable"}]}}

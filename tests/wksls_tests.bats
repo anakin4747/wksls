@@ -463,6 +463,22 @@ teardown() {
     diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_invalid_ptable.rpc.json"
 }
 
+@test "diagnostics on invalid --fstype space-separated value reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_invalid_fstype_space.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_invalid_fstype_space.rpc.json"
+}
+
+@test "diagnostics on invalid --ptable space-separated value reports error" {
+    lsts_initialize
+    lsts_open "fixtures/diagnostics_invalid_ptable_space.wks"
+    lsts_recv
+    _lsts_normalize
+    diff <(echo "$LSTS_RESPONSE") "fixtures/diagnostics_invalid_ptable_space.rpc.json"
+}
+
 @test "diagnostics update on didChange" {
     lsts_initialize
     lsts_open "fixtures/diagnostics_valid.wks"
