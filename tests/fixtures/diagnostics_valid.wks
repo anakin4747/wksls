@@ -1,2 +1,0 @@
-part / --source rootfs --ondisk sda --fstype=ext4 --align 1024
-bootloader --ptable gpt --timeout=5
