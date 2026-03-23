@@ -1,1 +1,0 @@
-{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_valid.wks","diagnostics":[]}}
