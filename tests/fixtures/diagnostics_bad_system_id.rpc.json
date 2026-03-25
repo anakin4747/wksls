@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_bad_system_id.wks","diagnostics":[{"range":{"start":{"line":0,"character":7},"end":{"line":0,"character":23}},"severity":1,"message":"Invalid --system-id value: 0x00 (must be hex 0x01–0xFF)"}]}}
