@@ -923,7 +923,7 @@ _validate_line_logic() {
 validate_document() {
     local text="$1"
     local lineno=0
-    local line_text directive stripped valid_flags
+    local line_text directive stripped valid_flags col_start
     local bootloader_seen=0
     diagnostics="[]"
 
@@ -941,7 +941,6 @@ validate_document() {
         case "$directive" in
             bootloader|part|partition|include) ;;
             *)
-                local col_start
                 col_start="$(_token_offset "$line_text" "$directive")"
                 diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
                     "$col_start" $((col_start + ${#directive})) \
