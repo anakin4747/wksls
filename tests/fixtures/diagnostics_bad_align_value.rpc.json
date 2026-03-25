@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_bad_align_value.wks","diagnostics":[{"range":{"start":{"line":0,"character":7},"end":{"line":0,"character":17}},"severity":1,"message":"Invalid --align value: 2K (expected a plain integer)"}]}}

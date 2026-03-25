@@ -806,6 +806,55 @@ _validate_enum_value() {
         "$lineno" "$col_start" $((col_start + ${#tok})) "$msg")"
 }
 
+# Validate the value of a flag that takes a typed argument (size, int, float,
+# hex byte).  Updates the global `diagnostics` variable.
+# Usage: _validate_flag_value <lineno> <line_text> <flag_name> <value> <tok>
+_validate_flag_value() {
+    local lineno="$1" line_text="$2" flag_name="$3" value="$4" tok="$5"
+    local col_start msg=""
+
+    case "$flag_name" in
+        --size|--fixed-size|--extra-filesystem-space|--extra-partition-space)
+            # <integer>[s|S|k|K|M|G]
+            [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid size value: $value (expected integer with optional suffix s|k|K|M|G)"
+            ;;
+        --offset)
+            # same sizetype but also accepts s/S as sector suffix
+            [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid offset value: $value (expected integer with optional suffix s|S|k|K|M|G)"
+            ;;
+        --align)
+            # plain integer, no suffix
+            [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid --align value: $value (expected a plain integer)"
+            ;;
+        --overhead-factor)
+            # float >= 1.0; use awk for portable float comparison
+            if [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+                awk -v v="$value" 'BEGIN { if (v < 1.0) exit 1 }' || \
+                    msg="--overhead-factor must be >= 1.0 (got $value)"
+            else
+                msg="Invalid --overhead-factor value: $value (expected a number >= 1.0)"
+            fi
+            ;;
+        --system-id)
+            # hex integer 0x01–0xFF
+            if [[ "$value" =~ ^0[xX][0-9a-fA-F]+$ || "$value" =~ ^[0-9a-fA-F]+$ ]]; then
+                local dec
+                dec="$(printf '%d' "$value" 2>/dev/null)" || dec=0
+                [[ $dec -ge 1 && $dec -le 255 ]] || \
+                    msg="Invalid --system-id value: $value (must be hex 0x01–0xFF)"
+            else
+                msg="Invalid --system-id value: $value (must be hex 0x01–0xFF)"
+            fi
+            ;;
+        *) return ;;
+    esac
+
+    [[ -z "$msg" ]] && return
+    col_start="$(_token_offset "$line_text" "$tok")"
+    diagnostics="$(_append_diagnostic "$diagnostics" \
+        "$lineno" "$col_start" $((col_start + ${#tok})) "$msg")"
+}
+
 # Validate one token from a directive line.
 # Updates the globals `diagnostics`, `prev_flag`, and the `line_flags` associative
 # array (passed by name) which maps flag names to their values (empty string for
@@ -818,6 +867,7 @@ _validate_token() {
 
     if [[ -n "$prev_flag" && "$tok" != --* ]]; then
         _validate_enum_value "$lineno" "$line_text" "$prev_flag" "$tok" "$tok"
+        _validate_flag_value "$lineno" "$line_text" "$prev_flag" "$tok" "$tok"
         _lf_ref["$prev_flag"]="$tok"
         prev_flag=""
         return
@@ -842,9 +892,12 @@ _validate_token() {
 
     if [[ -n "$flag_value" ]]; then
         _validate_enum_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
+        _validate_flag_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
     else
         case "$flag_name" in
             --fstype|--ptable) prev_flag="$flag_name" ;;
+            --size|--fixed-size|--extra-filesystem-space|--extra-partition-space|\
+            --offset|--align|--overhead-factor|--system-id) prev_flag="$flag_name" ;;
         esac
     fi
 }
@@ -913,6 +966,33 @@ _validate_line_logic() {
                 diagnostics="$(_append_diagnostic "$diagnostics" \
                     "$lineno" "$col_start" $((col_start + ${#tok})) \
                     "--use-label requires --label")"
+            fi
+
+            # --use-uuid and --uuid are contradictory: --use-uuid generates a
+            # UUID automatically, so supplying --uuid at the same time makes no
+            # sense.  Build the search token as --uuid=<value> when a value is
+            # present so that _token_offset does not accidentally match the
+            # --use-uuid prefix.
+            if [[ -v _lf[--use-uuid] && -v _lf[--uuid] ]]; then
+                local uuid_val="${_lf[--uuid]}"
+                if [[ -n "$uuid_val" ]]; then
+                    tok="--uuid=${uuid_val}"
+                else
+                    tok="--uuid"
+                fi
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--uuid cannot be used together with --use-uuid")"
+            fi
+
+            # --sourceparams is only meaningful when --source is also given.
+            if [[ -v _lf[--sourceparams] && ! -v _lf[--source] ]]; then
+                tok="--sourceparams"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--sourceparams requires --source")"
             fi
             ;;
     esac

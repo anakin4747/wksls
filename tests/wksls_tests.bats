@@ -507,6 +507,42 @@ teardown() {
         "fixtures/diagnostics_duplicate_bootloader.rpc.json"
 }
 
+@test "diagnostics on invalid --size value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bad_size_value.wks" \
+        "fixtures/diagnostics_bad_size_value.rpc.json"
+}
+
+@test "diagnostics on invalid --align value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bad_align_value.wks" \
+        "fixtures/diagnostics_bad_align_value.rpc.json"
+}
+
+@test "diagnostics on --overhead-factor below 1.0 reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bad_overhead_factor.wks" \
+        "fixtures/diagnostics_bad_overhead_factor.rpc.json"
+}
+
+@test "diagnostics on out-of-range --system-id reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bad_system_id.wks" \
+        "fixtures/diagnostics_bad_system_id.rpc.json"
+}
+
+@test "diagnostics on --use-uuid with --uuid reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_use_uuid_with_uuid.wks" \
+        "fixtures/diagnostics_use_uuid_with_uuid.rpc.json"
+}
+
+@test "diagnostics on --sourceparams without --source reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_sourceparams_no_source.wks" \
+        "fixtures/diagnostics_sourceparams_no_source.rpc.json"
+}
+
 @test "diagnostics update on didChange" {
     lsts_initialize
     lsts_open "fixtures/diagnostics_unknown_flag.wks"

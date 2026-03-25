@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_use_uuid_with_uuid.wks","diagnostics":[{"range":{"start":{"line":0,"character":18},"end":{"line":0,"character":61}},"severity":1,"message":"--uuid cannot be used together with --use-uuid"}]}}
