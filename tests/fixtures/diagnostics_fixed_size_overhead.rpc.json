@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_fixed_size_overhead.wks","diagnostics":[{"range":{"start":{"line":0,"character":25},"end":{"line":0,"character":42}},"severity":1,"message":"--overhead-factor cannot be used with --fixed-size"}]}}

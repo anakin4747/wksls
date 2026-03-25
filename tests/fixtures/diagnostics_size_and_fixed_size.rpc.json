@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_size_and_fixed_size.wks","diagnostics":[{"range":{"start":{"line":0,"character":19},"end":{"line":0,"character":31}},"severity":1,"message":"--size and --fixed-size are mutually exclusive"}]}}

@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_squashfs_fsuuid.wks","diagnostics":[{"range":{"start":{"line":0,"character":42},"end":{"line":0,"character":50}},"severity":1,"message":"--fsuuid is not supported with --fstype squashfs"}]}}
