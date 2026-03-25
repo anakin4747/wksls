@@ -814,13 +814,10 @@ _validate_flag_value() {
     local col_start msg=""
 
     case "$flag_name" in
-        --size|--fixed-size|--extra-filesystem-space|--extra-partition-space)
-            # <integer>[s|S|k|K|M|G]
-            [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid size value: $value (expected integer with optional suffix s|k|K|M|G)"
-            ;;
+        --size|--fixed-size|--extra-filesystem-space|--extra-partition-space|\
         --offset)
-            # same sizetype but also accepts s/S as sector suffix
-            [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid offset value: $value (expected integer with optional suffix s|S|k|K|M|G)"
+            # <integer>[s|S|k|K|M|G]  (sector/kibibyte/mebibyte/gibibyte suffix)
+            [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid size value: $value (expected integer with optional suffix s|k|K|M|G)"
             ;;
         --align)
             # plain integer, no suffix
@@ -895,7 +892,7 @@ _validate_token() {
         _validate_flag_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
     else
         case "$flag_name" in
-            --fstype|--ptable) prev_flag="$flag_name" ;;
+            --fstype|--ptable|\
             --size|--fixed-size|--extra-filesystem-space|--extra-partition-space|\
             --offset|--align|--overhead-factor|--system-id) prev_flag="$flag_name" ;;
         esac
