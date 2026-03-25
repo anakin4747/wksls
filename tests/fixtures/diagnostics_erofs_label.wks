@@ -1,0 +1,1 @@
+part / --fstype erofs --source rootfs --label boot

@@ -459,6 +459,54 @@ teardown() {
         "fixtures/diagnostics_invalid_ptable_space.rpc.json"
 }
 
+@test "diagnostics on --size and --fixed-size together reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_size_and_fixed_size.wks" \
+        "fixtures/diagnostics_size_and_fixed_size.rpc.json"
+}
+
+@test "diagnostics on --overhead-factor with --fixed-size reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_fixed_size_overhead.wks" \
+        "fixtures/diagnostics_fixed_size_overhead.rpc.json"
+}
+
+@test "diagnostics on --extra-filesystem-space with --fixed-size reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_fixed_size_extra_space.wks" \
+        "fixtures/diagnostics_fixed_size_extra_space.rpc.json"
+}
+
+@test "diagnostics on --label with squashfs reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_squashfs_label.wks" \
+        "fixtures/diagnostics_squashfs_label.rpc.json"
+}
+
+@test "diagnostics on --fsuuid with squashfs reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_squashfs_fsuuid.wks" \
+        "fixtures/diagnostics_squashfs_fsuuid.rpc.json"
+}
+
+@test "diagnostics on --label with erofs reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_erofs_label.wks" \
+        "fixtures/diagnostics_erofs_label.rpc.json"
+}
+
+@test "diagnostics on --use-label without --label reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_use_label_no_label.wks" \
+        "fixtures/diagnostics_use_label_no_label.rpc.json"
+}
+
+@test "diagnostics on duplicate bootloader directive reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_duplicate_bootloader.wks" \
+        "fixtures/diagnostics_duplicate_bootloader.rpc.json"
+}
+
 @test "diagnostics update on didChange" {
     lsts_initialize
     lsts_open "fixtures/diagnostics_unknown_flag.wks"

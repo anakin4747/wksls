@@ -1,0 +1,1 @@
+part / --fstype squashfs --source rootfs --label boot

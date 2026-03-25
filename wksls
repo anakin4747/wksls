@@ -744,12 +744,12 @@ HEREDOC
 )"
 
 # Valid flags for each directive.
-BOOTLOADER_FLAGS="--append --configfile --ptable --timeout"
-PART_FLAGS="--active --align --exclude-path --extra-filesystem-space --extra-partition-space --fixed-size --fsoptions --fstype --fsuuid --label --mkfs-extraopts --no-table --offset --ondisk --ondrive --overhead-factor --part-name --part-type --rootfs --rootfs-dir --size --source --sourceparams --system-id --use-uuid --uuid"
+BOOTLOADER_FLAGS="--append --configfile --diskid --ptable --source --timeout"
+PART_FLAGS="--active --align --change-directory --exclude-path --extra-filesystem-space --extra-partition-space --fixed-size --fsoptions --fspassno --fstype --fsuuid --hidden --include-path --label --mbr --mkfs-extraopts --no-fstab-update --no-table --offset --ondisk --ondrive --overhead-factor --part-name --part-type --rootfs --rootfs-dir --size --source --sourceparams --system-id --type --use-label --use-uuid --uuid"
 
 # Valid values for enumerated flags.
 FSTYPE_VALUES="btrfs efi erofs ext2 ext3 ext4 msdos squashfs swap vfat"
-PTABLE_VALUES="gpt msdos"
+PTABLE_VALUES="gpt gpt-hybrid msdos"
 
 # Return 0 if the given word is present in the given space-separated list.
 _in_list() {
@@ -807,14 +807,18 @@ _validate_enum_value() {
 }
 
 # Validate one token from a directive line.
-# Updates the globals `diagnostics` and `prev_flag`.
-# Usage: _validate_token <lineno> <line_text> <directive> <valid_flags> <tok>
+# Updates the globals `diagnostics`, `prev_flag`, and the `line_flags` associative
+# array (passed by name) which maps flag names to their values (empty string for
+# boolean flags).
+# Usage: _validate_token <lineno> <line_text> <directive> <valid_flags> <tok> <line_flags_var>
 _validate_token() {
     local lineno="$1" line_text="$2" directive="$3" valid_flags="$4" tok="$5"
+    local -n _lf_ref="$6"
     local col_start flag_name flag_value
 
     if [[ -n "$prev_flag" && "$tok" != --* ]]; then
         _validate_enum_value "$lineno" "$line_text" "$prev_flag" "$tok" "$tok"
+        _lf_ref["$prev_flag"]="$tok"
         prev_flag=""
         return
     fi
@@ -834,6 +838,8 @@ _validate_token() {
         return
     fi
 
+    _lf_ref["$flag_name"]="$flag_value"
+
     if [[ -n "$flag_value" ]]; then
         _validate_enum_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
     else
@@ -843,12 +849,82 @@ _validate_token() {
     fi
 }
 
+# Check logical constraints between flags on a single directive line.
+# Updates the global `diagnostics`.
+# Usage: _validate_line_logic <lineno> <line_text> <directive> <line_flags_var>
+_validate_line_logic() {
+    local lineno="$1" line_text="$2" directive="$3"
+    local -n _lf="$4"
+    local col_start tok
+
+    case "$directive" in
+        part|partition)
+            # --size and --fixed-size are mutually exclusive.
+            if [[ -v _lf[--size] && -v _lf[--fixed-size] ]]; then
+                tok="--fixed-size"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--size and --fixed-size are mutually exclusive")"
+            fi
+
+            # --fixed-size is incompatible with --overhead-factor.
+            if [[ -v _lf[--fixed-size] && -v _lf[--overhead-factor] ]]; then
+                tok="--overhead-factor"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--overhead-factor cannot be used with --fixed-size")"
+            fi
+
+            # --fixed-size is incompatible with --extra-filesystem-space.
+            if [[ -v _lf[--fixed-size] && -v _lf[--extra-filesystem-space] ]]; then
+                tok="--extra-filesystem-space"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--extra-filesystem-space cannot be used with --fixed-size")"
+            fi
+
+            local fstype="${_lf[--fstype]:-}"
+
+            # squashfs and erofs do not support --label.
+            if [[ "$fstype" == squashfs || "$fstype" == erofs ]] && [[ -v _lf[--label] ]]; then
+                tok="--label"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--label is not supported with --fstype $fstype")"
+            fi
+
+            # squashfs does not support --fsuuid.
+            if [[ "$fstype" == squashfs ]] && [[ -v _lf[--fsuuid] ]]; then
+                tok="--fsuuid"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--fsuuid is not supported with --fstype squashfs")"
+            fi
+
+            # --use-label requires --label.
+            if [[ -v _lf[--use-label] && ! -v _lf[--label] ]]; then
+                tok="--use-label"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--use-label requires --label")"
+            fi
+            ;;
+    esac
+}
+
 # Validate document text and print a JSON array of LSP diagnostic objects.
 # Each diagnostic has: range, severity (1=Error), message.
 validate_document() {
     local text="$1"
     local lineno=0
     local line_text directive stripped valid_flags
+    local bootloader_seen=0
     diagnostics="[]"
 
     while IFS= read -r line_text; do
@@ -876,16 +952,29 @@ validate_document() {
         esac
 
         case "$directive" in
-            bootloader)     valid_flags="$BOOTLOADER_FLAGS" ;;
+            bootloader)
+                bootloader_seen=$((bootloader_seen + 1))
+                if [[ $bootloader_seen -gt 1 ]]; then
+                    col_start="$(_token_offset "$line_text" "bootloader")"
+                    diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                        "$col_start" $((col_start + ${#directive})) \
+                        "Only one bootloader directive is allowed")"
+                fi
+                valid_flags="$BOOTLOADER_FLAGS"
+                ;;
             part|partition) valid_flags="$PART_FLAGS" ;;
             include)        lineno=$((lineno + 1)); continue ;;
         esac
 
+        # shellcheck disable=SC2034  # passed by name to _validate_token/_validate_line_logic
+        local -A line_flags=()
         local i=1 prev_flag=""
         while [[ $i -lt ${#tokens[@]} ]]; do
-            _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" "${tokens[$i]}"
+            _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" "${tokens[$i]}" line_flags
             i=$((i + 1))
         done
+
+        _validate_line_logic "$lineno" "$line_text" "$directive" line_flags
 
         lineno=$((lineno + 1))
     done < <(printf '%s\n' "$text")
