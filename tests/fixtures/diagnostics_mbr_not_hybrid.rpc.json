@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_mbr_not_hybrid.wks","diagnostics":[{"range":{"start":{"line":1,"character":7},"end":{"line":1,"character":12}},"severity":1,"message":"--mbr requires a gpt-hybrid partition table (got gpt)"}]}}

@@ -1,0 +1,2 @@
+bootloader --ptable=gpt
+part / --mbr

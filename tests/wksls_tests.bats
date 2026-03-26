@@ -543,6 +543,24 @@ teardown() {
         "fixtures/diagnostics_sourceparams_no_source.rpc.json"
 }
 
+@test "diagnostics on --part-name with msdos ptable reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_part_name_msdos.wks" \
+        "fixtures/diagnostics_part_name_msdos.rpc.json"
+}
+
+@test "diagnostics on --part-type with msdos ptable reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_part_type_msdos.wks" \
+        "fixtures/diagnostics_part_type_msdos.rpc.json"
+}
+
+@test "diagnostics on --mbr without gpt-hybrid ptable reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_mbr_not_hybrid.wks" \
+        "fixtures/diagnostics_mbr_not_hybrid.rpc.json"
+}
+
 @test "diagnostics update on didChange" {
     lsts_initialize
     lsts_open "fixtures/diagnostics_unknown_flag.wks"

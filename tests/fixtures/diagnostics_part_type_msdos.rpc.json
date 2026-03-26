@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_part_type_msdos.wks","diagnostics":[{"range":{"start":{"line":1,"character":7},"end":{"line":1,"character":18}},"severity":1,"message":"--part-type is not supported with msdos partition table"}]}}
