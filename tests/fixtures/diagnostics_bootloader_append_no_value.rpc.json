@@ -1,0 +1,1 @@
+{"jsonrpc":"2.0","method":"textDocument/publishDiagnostics","params":{"uri":"file://$LSTS_ROOT/fixtures/diagnostics_bootloader_append_no_value.wks","diagnostics":[{"range":{"start":{"line":0,"character":11},"end":{"line":0,"character":19}},"severity":1,"message":"--append requires a value"}]}}
