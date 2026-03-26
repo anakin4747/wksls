@@ -501,6 +501,12 @@ teardown() {
         "fixtures/diagnostics_use_label_no_label.rpc.json"
 }
 
+@test "diagnostics on --label without a value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_label_no_value.wks" \
+        "fixtures/diagnostics_label_no_value.rpc.json"
+}
+
 @test "diagnostics on duplicate bootloader directive reports error" {
     lsts_diagnostics \
         "fixtures/diagnostics_duplicate_bootloader.wks" \

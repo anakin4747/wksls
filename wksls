@@ -869,6 +869,12 @@ _validate_token() {
         prev_flag=""
         return
     fi
+    if [[ -n "$prev_flag" ]]; then
+        col_start="$(_token_offset "$line_text" "$prev_flag")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
+            "$prev_flag requires a value")"
+    fi
     prev_flag=""
 
     [[ "$tok" == --* ]] || return
@@ -894,7 +900,8 @@ _validate_token() {
         case "$flag_name" in
             --fstype|--ptable|\
             --size|--fixed-size|--extra-filesystem-space|--extra-partition-space|\
-            --offset|--align|--overhead-factor|--system-id) prev_flag="$flag_name" ;;
+            --offset|--align|--overhead-factor|--system-id|\
+            --label) prev_flag="$flag_name" ;;
         esac
     fi
 }
@@ -1101,6 +1108,14 @@ validate_document() {
             _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" "${tokens[$i]}" line_flags
             i=$((i + 1))
         done
+
+        if [[ -n "$prev_flag" ]]; then
+            local col_start
+            col_start="$(_token_offset "$line_text" "$prev_flag")"
+            diagnostics="$(_append_diagnostic "$diagnostics" \
+                "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
+                "$prev_flag requires a value")"
+        fi
 
         _validate_line_logic "$lineno" "$line_text" "$directive" line_flags "$doc_ptable"
 
