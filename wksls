@@ -898,10 +898,8 @@ _validate_token() {
         _validate_flag_value "$lineno" "$line_text" "$flag_name" "$flag_value" "$tok"
     else
         case "$flag_name" in
-            --fstype|--ptable|\
-            --size|--fixed-size|--extra-filesystem-space|--extra-partition-space|\
-            --offset|--align|--overhead-factor|--system-id|\
-            --label) prev_flag="$flag_name" ;;
+            --active|--hidden|--mbr|--no-fstab-update|--no-table|--use-label|--use-uuid) ;;
+            *) prev_flag="$flag_name" ;;
         esac
     fi
 }

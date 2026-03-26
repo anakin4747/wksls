@@ -507,6 +507,18 @@ teardown() {
         "fixtures/diagnostics_label_no_value.rpc.json"
 }
 
+@test "diagnostics on --source without a value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_source_no_value.wks" \
+        "fixtures/diagnostics_source_no_value.rpc.json"
+}
+
+@test "diagnostics on bootloader --append without a value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bootloader_append_no_value.wks" \
+        "fixtures/diagnostics_bootloader_append_no_value.rpc.json"
+}
+
 @test "diagnostics on duplicate bootloader directive reports error" {
     lsts_diagnostics \
         "fixtures/diagnostics_duplicate_bootloader.wks" \
