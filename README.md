@@ -115,7 +115,7 @@ Legend: `[x]` implemented · `[ ]` not implemented · `[-]` not applicable / out
 
 | Status | Method |
 |---|---|
-| `[x]` | `initialize` — advertises `hoverProvider`, `completionProvider`, full-sync `textDocumentSync` |
+| `[x]` | `initialize` — advertises `hoverProvider`, `completionProvider`, `definitionProvider`, full-sync `textDocumentSync` |
 | `[ ]` | `initialized` — notification silently ignored |
 | `[ ]` | `shutdown` — silently ignored (non-conformant); blocked on `lsts_shutdown` upstream |
 | `[x]` | `exit` — cleanly exits the process |
@@ -141,12 +141,12 @@ Legend: `[x]` implemented · `[ ]` not implemented · `[-]` not applicable / out
 
 | Status | Method |
 |---|---|
-| `[x]` | `textDocument/hover` — markdown docs for all 32 keywords and flags |
-| `[x]` | `textDocument/completion` — all keywords/flags; context-aware values for `--fstype` and `--ptable` |
+| `[x]` | `textDocument/hover` — markdown docs for all keywords and flags; hover over `--source` plugin values shows plugin documentation |
+| `[x]` | `textDocument/completion` — all keywords and flags; context-aware values for `--fstype`, `--ptable`, and `--source`; scoped to `bootloader` vs `part` flags |
 | `[ ]` | `completionItem/resolve` |
 | `[ ]` | `textDocument/signatureHelp` |
 | `[ ]` | `textDocument/declaration` |
-| `[ ]` | `textDocument/definition` |
+| `[x]` | `textDocument/definition` — jump-to-definition for `--source` plugin values; resolves to the plugin `.py` file in the OE tree |
 | `[ ]` | `textDocument/typeDefinition` |
 | `[ ]` | `textDocument/implementation` |
 | `[ ]` | `textDocument/references` |
@@ -188,8 +188,35 @@ Legend: `[x]` implemented · `[ ]` not implemented · `[-]` not applicable / out
 
 | Status | Method |
 |---|---|
-| `[ ]` | `textDocument/publishDiagnostics` — push model; no validation implemented; blocked on `lsts_recv_notification` upstream |
-| `[ ]` | `textDocument/diagnostic` — pull model (LSP 3.17); blocked on missing lsts helper upstream |
+| `[x]` | `textDocument/publishDiagnostics` — push model; emitted on `didOpen` and `didChange` with the following checks: |
+
+**Syntax errors**
+
+- Unknown directive
+- Unknown flag for `bootloader` or `part`/`partition`
+- Invalid value for `--fstype` (must be one of `btrfs efi erofs ext2 ext3 ext4 msdos squashfs swap vfat`)
+- Invalid value for `--ptable` (must be one of `gpt gpt-hybrid msdos`)
+- Invalid size value for `--size`, `--fixed-size`, `--extra-filesystem-space`, `--extra-partition-space`, `--offset`
+- Invalid integer for `--align`
+- Invalid float (must be ≥ 1.0) for `--overhead-factor`
+- Invalid hex byte (0x01–0xFF) for `--system-id`
+- Missing value for `--label` (flag present with no argument)
+
+**Logical errors**
+
+- `--size` and `--fixed-size` are mutually exclusive
+- `--overhead-factor` cannot be used with `--fixed-size`
+- `--extra-filesystem-space` cannot be used with `--fixed-size`
+- `--label` is incompatible with `squashfs` and `erofs` filesystems
+- `--fsuuid` is incompatible with `squashfs`
+- `--use-label` requires `--label`
+- `--use-uuid` cannot be combined with `--uuid`
+- `--sourceparams` requires `--source`
+- `--part-name` requires a GPT partition table
+- `--part-type` requires a GPT partition table
+- `--mbr` requires `--ptable gpt-hybrid`
+
+| `[ ]` | `textDocument/diagnostic` — pull model (LSP 3.17) |
 | `[ ]` | `workspace/diagnostic` |
 
 ### Workspace features
