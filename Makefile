@@ -6,7 +6,11 @@ all:
 	nix develop --command make test lint
 
 dev:
-	st -e nvim --clean -u $(CURDIR)/dev/init.lua &
+	st -e \
+		nix develop --command \
+			nvim --clean \
+				-u $(CURDIR)/dev/init.lua \
+				$(CURDIR)/tests/openembedded-core/scripts/lib/wic/canned-wks/systemd-bootdisk.wks &
 
 lint:
 	shellcheck --external-sources --shell=bash wksls tests/*_tests.bats
