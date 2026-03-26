@@ -1,9 +1,12 @@
-.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext
+.PHONY: all dev test lint install install-manual uninstall-manual install-vscode-ext
 
 PREFIX ?= /usr/local
 
 all:
 	nix develop --command make test lint
+
+dev:
+	st -e nvim --clean -u $(CURDIR)/dev/init.lua &
 
 lint:
 	shellcheck --external-sources --shell=bash wksls tests/*_tests.bats
