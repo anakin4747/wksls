@@ -1,0 +1,2 @@
+bootloader --ptable=msdos
+part / --part-type=0x83

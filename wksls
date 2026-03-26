@@ -901,10 +901,11 @@ _validate_token() {
 
 # Check logical constraints between flags on a single directive line.
 # Updates the global `diagnostics`.
-# Usage: _validate_line_logic <lineno> <line_text> <directive> <line_flags_var>
+# Usage: _validate_line_logic <lineno> <line_text> <directive> <line_flags_var> <doc_ptable>
 _validate_line_logic() {
     local lineno="$1" line_text="$2" directive="$3"
     local -n _lf="$4"
+    local doc_ptable="${5:-msdos}"
     local col_start tok
 
     case "$directive" in
@@ -991,6 +992,33 @@ _validate_line_logic() {
                     "$lineno" "$col_start" $((col_start + ${#tok})) \
                     "--sourceparams requires --source")"
             fi
+
+            # --part-name is GPT-only; msdos does not support named partitions.
+            if [[ "$doc_ptable" == msdos && -v _lf[--part-name] ]]; then
+                tok="--part-name"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--part-name is not supported with msdos partition table")"
+            fi
+
+            # --part-type is GPT-only; msdos does not support custom partition types.
+            if [[ "$doc_ptable" == msdos && -v _lf[--part-type] ]]; then
+                tok="--part-type"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--part-type is not supported with msdos partition table")"
+            fi
+
+            # --mbr requires a gpt-hybrid partition table.
+            if [[ -v _lf[--mbr] && "$doc_ptable" != gpt-hybrid ]]; then
+                tok="--mbr"
+                col_start="$(_token_offset "$line_text" "$tok")"
+                diagnostics="$(_append_diagnostic "$diagnostics" \
+                    "$lineno" "$col_start" $((col_start + ${#tok})) \
+                    "--mbr requires a gpt-hybrid partition table (got $doc_ptable)")"
+            fi
             ;;
     esac
 }
@@ -1003,6 +1031,30 @@ validate_document() {
     local line_text directive stripped valid_flags col_start
     local bootloader_seen=0
     diagnostics="[]"
+
+    # Pre-scan: extract the ptable from the bootloader line (default: msdos).
+    local doc_ptable="msdos"
+    local _scan_line _scan_tok _scan_prev=""
+    while IFS= read -r _scan_line; do
+        _scan_line="${_scan_line%%#*}"
+        [[ "$_scan_line" != *bootloader* ]] && continue
+        local -a _scan_tokens=()
+        read -ra _scan_tokens <<< "$_scan_line"
+        [[ "${_scan_tokens[0]:-}" != bootloader ]] && continue
+        for _scan_tok in "${_scan_tokens[@]:1}"; do
+            if [[ -n "$_scan_prev" && "$_scan_tok" != --* ]]; then
+                [[ "$_scan_prev" == --ptable ]] && doc_ptable="$_scan_tok"
+                _scan_prev=""
+            elif [[ "$_scan_tok" == --ptable=* ]]; then
+                doc_ptable="${_scan_tok#--ptable=}"
+            elif [[ "$_scan_tok" == --ptable ]]; then
+                _scan_prev="--ptable"
+            else
+                _scan_prev=""
+            fi
+        done
+        break
+    done < <(printf '%s\n' "$text")
 
     while IFS= read -r line_text; do
         line_text="${line_text%$'\r'}"
@@ -1050,7 +1102,7 @@ validate_document() {
             i=$((i + 1))
         done
 
-        _validate_line_logic "$lineno" "$line_text" "$directive" line_flags
+        _validate_line_logic "$lineno" "$line_text" "$directive" line_flags "$doc_ptable"
 
         lineno=$((lineno + 1))
     done < <(printf '%s\n' "$text")
