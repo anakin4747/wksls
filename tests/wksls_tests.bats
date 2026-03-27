@@ -585,6 +585,12 @@ teardown() {
         "fixtures/diagnostics_mbr_not_hybrid.rpc.json"
 }
 
+@test "diagnostics on unclosed double quote reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_unclosed_quote.wks" \
+        "fixtures/diagnostics_unclosed_quote.rpc.json"
+}
+
 @test "diagnostics update on didChange" {
     lsts_initialize
     lsts_open "fixtures/diagnostics_unknown_flag.wks"
