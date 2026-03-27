@@ -850,6 +850,10 @@ _validate_flag_value() {
             # plain integer, no suffix
             [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid --align value: $value (expected a plain integer)"
             ;;
+        --timeout)
+            # non-negative integer (seconds)
+            [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid --timeout value: $value (expected a plain integer)"
+            ;;
         --overhead-factor)
             # float >= 1.0; use awk for portable float comparison
             if [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then

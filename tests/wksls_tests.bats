@@ -543,6 +543,12 @@ teardown() {
         "fixtures/diagnostics_bad_align_value.rpc.json"
 }
 
+@test "diagnostics on invalid --timeout value reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_bad_timeout_value.wks" \
+        "fixtures/diagnostics_bad_timeout_value.rpc.json"
+}
+
 @test "diagnostics on --overhead-factor below 1.0 reports error" {
     lsts_diagnostics \
         "fixtures/diagnostics_bad_overhead_factor.wks" \
