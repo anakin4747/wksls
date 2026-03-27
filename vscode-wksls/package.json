@@ -19,7 +19,7 @@
       {
         "id": "wks",
         "aliases": ["WKS", "wks"],
-        "extensions": [".wks"],
+        "extensions": [".wks", ".wks.in", ".wks.inc"],
         "configuration": "./language-configuration.json"
       }
     ]
