@@ -1060,7 +1060,7 @@ _validate_line_logic() {
 validate_document() {
     local text="$1"
     local lineno=0
-    local line_text directive stripped valid_flags col_start
+    local line_text directive stripped valid_flags col_start quote_count
     local bootloader_seen=0
     diagnostics="[]"
 
@@ -1098,7 +1098,7 @@ validate_document() {
 
         # Check for an unclosed double quote: an odd number of " on the line
         # means the last " opens a string that is never closed.
-        local quote_count="${stripped//[^\"]/}"
+        quote_count="${stripped//[^\"]/}"
         if (( ${#quote_count} % 2 != 0 )); then
             col_start="${line_text%\"*}"
             col_start="${#col_start}"
