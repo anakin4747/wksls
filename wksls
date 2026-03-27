@@ -846,13 +846,9 @@ _validate_flag_value() {
             # <integer>[s|S|k|K|M|G]  (sector/kibibyte/mebibyte/gibibyte suffix)
             [[ "$value" =~ ^[0-9]+([sSkKMG])?$ ]] || msg="Invalid size value: $value (expected integer with optional suffix s|k|K|M|G)"
             ;;
-        --align)
+        --align|--timeout)
             # plain integer, no suffix
-            [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid --align value: $value (expected a plain integer)"
-            ;;
-        --timeout)
-            # non-negative integer (seconds)
-            [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid --timeout value: $value (expected a plain integer)"
+            [[ "$value" =~ ^[0-9]+$ ]] || msg="Invalid $flag_name value: $value (expected a plain integer)"
             ;;
         --overhead-factor)
             # float >= 1.0; use awk for portable float comparison
