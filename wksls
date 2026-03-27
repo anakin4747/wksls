@@ -94,6 +94,22 @@ prev_flag_at() {
     printf '%s' "$prev"
 }
 
+# Return true if the cursor is positioned on the mntpoint argument of a
+# part/partition line, i.e. the token immediately after the directive keyword.
+mntpoint_at() {
+    local text="$1" line="$2" character="$3"
+    local line_text before no_partial trimmed prev TOKEN WORD
+    line_text="$(printf '%s' "$text" | sed -n "$((line + 1))p")"
+    before="${line_text:0:$((character + 1))}"
+    no_partial="$(printf '%s' "$before" | sed 's/[^[:space:]]*$//')"
+    trimmed="$(printf '%s' "$no_partial" | sed 's/[[:space:]]*$//')"
+    prev="${trimmed##*[$'\t ']}"
+    [[ "$prev" == part || "$prev" == partition ]] || return 1
+    _token_at "$text" "$line" "$character"
+    [[ "$TOKEN" == --* ]] && return 1
+    return 0
+}
+
 # Return the leading directive keyword of the given line (bootloader, part, or
 # partition), or empty string if the line does not start with a known directive.
 directive_at() {
@@ -375,6 +391,17 @@ The `mntpoint` must be one of:
 - `--system-id`: Partition system ID (one byte hexadecimal).
 
 - `--mkfs-extraopts`: Additional options passed to the `mkfs` utility.
+HEREDOC
+)"
+
+MNTPOINT_DOC="$(cat <<'HEREDOC'
+## `mntpoint`
+
+The mount point for the partition. Must be one of:
+- `/path`: An absolute path, for example `/`, `/usr`, or `/home`.
+- `swap`: The partition is used as swap space.
+
+> **Note:** The mount program must understand the PARTUUID syntax you use with `--use-uuid` and non-root mountpoint, including swap.
 HEREDOC
 )"
 
@@ -1189,6 +1216,10 @@ handle_hover() {
             rawcopy)              send_hover "$id" "$SOURCE_PLUGIN_RAWCOPY_DOC" ;;
             *)                    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}" ;;
         esac
+        return
+    fi
+    if mntpoint_at "$text" "$line" "$character"; then
+        send_hover "$id" "$MNTPOINT_DOC"
         return
     fi
     case "$(word_at "$text" "$line" "$character")" in

@@ -46,6 +46,12 @@ teardown() {
         "fixtures/hover_part.rpc.json"
 }
 
+@test "hover over mntpoint returns documentation" {
+    lsts_hover \
+        "fixtures/hover.wks:1:10" \
+        "fixtures/hover_mntpoint.rpc.json"
+}
+
 @test "hover over --source returns documentation" {
     lsts_hover \
         "openembedded-core/meta/recipes-core/ovmf/ovmf-shell-image/ovmf-shell-image.wks:3:8" \
