@@ -1055,18 +1055,11 @@ _validate_line_logic() {
     esac
 }
 
-# Validate document text and print a JSON array of LSP diagnostic objects.
-# Each diagnostic has: range, severity (1=Error), message.
-validate_document() {
+# Pre-scan document text and return the --ptable value from the bootloader
+# line, or "msdos" if none is found.
+_prescan_ptable() {
     local text="$1"
-    local lineno=0
-    local line_text directive stripped valid_flags col_start quote_count
-    local bootloader_seen=0
-    diagnostics="[]"
-
-    # Pre-scan: extract the ptable from the bootloader line (default: msdos).
-    local doc_ptable="msdos"
-    local _scan_line _scan_tok _scan_prev=""
+    local _scan_line _scan_tok _scan_prev="" doc_ptable="msdos"
     while IFS= read -r _scan_line; do
         _scan_line="${_scan_line%%#*}"
         [[ "$_scan_line" != *bootloader* ]] && continue
@@ -1087,6 +1080,103 @@ validate_document() {
         done
         break
     done < <(printf '%s\n' "$text")
+    printf '%s' "$doc_ptable"
+}
+
+# Check a stripped line for an unclosed double quote.
+# Updates the global `diagnostics` if one is found.
+# Returns 1 if an unclosed quote was found (caller should skip the line), 0
+# otherwise.
+_check_unclosed_quote() {
+    local lineno="$1" line_text="$2" stripped="$3"
+    local quote_count col_start
+    quote_count="${stripped//[^\"]/}"
+    (( ${#quote_count} % 2 == 0 )) && return 0
+    col_start="${line_text%\"*}"
+    col_start="${#col_start}"
+    diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+        "$col_start" $((col_start + 1)) \
+        "Unclosed double quote")"
+    return 1
+}
+
+# Validate the directive token and resolve valid_flags for it.
+# Updates global `diagnostics` and the caller's `bootloader_seen` (passed by
+# name).  Sets the output variable (5th arg, passed by name) to the valid flags
+# string.  Returns 1 when an error diagnostic was emitted (caller should skip
+# the line), 2 when the line should be silently skipped (include directive).
+_resolve_directive_flags() {
+    local lineno="$1" line_text="$2" directive="$3"
+    local -n _bs_ref="$4"       # bootloader_seen (integer, passed by name)
+    local -n _out_flags="$5"    # output: valid flags string
+    local col_start
+
+    case "$directive" in
+        bootloader|part|partition|include) ;;
+        *)
+            col_start="$(_token_offset "$line_text" "$directive")"
+            diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                "$col_start" $((col_start + ${#directive})) \
+                "Unknown directive: $directive")"
+            return 1
+            ;;
+    esac
+
+    case "$directive" in
+        bootloader)
+            _bs_ref=$((_bs_ref + 1))
+            if [[ $_bs_ref -gt 1 ]]; then
+                col_start="$(_token_offset "$line_text" "bootloader")"
+                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                    "$col_start" $((col_start + ${#directive})) \
+                    "Only one bootloader directive is allowed")"
+            fi
+            _out_flags="$BOOTLOADER_FLAGS"
+            ;;
+        part|partition)
+            _out_flags="$PART_FLAGS"
+            ;;
+        include)
+            return 2
+            ;;
+    esac
+}
+
+# Iterate over all flag tokens on a directive line, delegating each to
+# _validate_token, then handle any trailing flag that expected a value.
+# Updates the global `diagnostics`.
+_validate_tokens_on_line() {
+    local lineno="$1" line_text="$2" directive="$3" valid_flags="$4"
+    local -n _vt_tokens="$5"    # tokens array, passed by name
+    local -n _vt_flags="$6"     # line_flags assoc array, passed by name
+
+    local i=1 prev_flag="" col_start
+    while [[ $i -lt ${#_vt_tokens[@]} ]]; do
+        _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" \
+            "${_vt_tokens[$i]}" _vt_flags
+        i=$((i + 1))
+    done
+
+    if [[ -n "$prev_flag" ]]; then
+        col_start="$(_token_offset "$line_text" "$prev_flag")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
+            "$prev_flag requires a value")"
+    fi
+}
+
+# Validate document text and print a JSON array of LSP diagnostic objects.
+# Each diagnostic has: range, severity (1=Error), message.
+validate_document() {
+    local text="$1"
+    local lineno=0
+    local line_text directive stripped valid_flags
+    # shellcheck disable=SC2034  # mutated by name-ref inside _resolve_directive_flags
+    local bootloader_seen=0
+    diagnostics="[]"
+
+    local doc_ptable
+    doc_ptable="$(_prescan_ptable "$text")"
 
     while IFS= read -r line_text; do
         line_text="${line_text%$'\r'}"
@@ -1094,17 +1184,13 @@ validate_document() {
         stripped="${line_text%%#*}"
         stripped="${stripped#"${stripped%%[![:space:]]*}"}"  # ltrim
         stripped="${stripped%"${stripped##*[![:space:]]}"}"  # rtrim
-        [[ -z "$stripped" ]] && { lineno=$((lineno + 1)); continue; }
 
-        # Check for an unclosed double quote: an odd number of " on the line
-        # means the last " opens a string that is never closed.
-        quote_count="${stripped//[^\"]/}"
-        if (( ${#quote_count} % 2 != 0 )); then
-            col_start="${line_text%\"*}"
-            col_start="${#col_start}"
-            diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                "$col_start" $((col_start + 1)) \
-                "Unclosed double quote")"
+        if [[ -z "$stripped" ]]; then
+            lineno=$((lineno + 1))
+            continue
+        fi
+
+        if ! _check_unclosed_quote "$lineno" "$line_text" "$stripped"; then
             lineno=$((lineno + 1))
             continue
         fi
@@ -1112,48 +1198,18 @@ validate_document() {
         read -ra tokens <<< "$stripped"
         directive="${tokens[0]}"
 
-        case "$directive" in
-            bootloader|part|partition|include) ;;
-            *)
-                col_start="$(_token_offset "$line_text" "$directive")"
-                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                    "$col_start" $((col_start + ${#directive})) \
-                    "Unknown directive: $directive")"
-                lineno=$((lineno + 1))
-                continue
-                ;;
-        esac
-
-        case "$directive" in
-            bootloader)
-                bootloader_seen=$((bootloader_seen + 1))
-                if [[ $bootloader_seen -gt 1 ]]; then
-                    col_start="$(_token_offset "$line_text" "bootloader")"
-                    diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                        "$col_start" $((col_start + ${#directive})) \
-                        "Only one bootloader directive is allowed")"
-                fi
-                valid_flags="$BOOTLOADER_FLAGS"
-                ;;
-            part|partition) valid_flags="$PART_FLAGS" ;;
-            include)        lineno=$((lineno + 1)); continue ;;
-        esac
-
-        # shellcheck disable=SC2034  # passed by name to _validate_token/_validate_line_logic
-        local -A line_flags=()
-        local i=1 prev_flag=""
-        while [[ $i -lt ${#tokens[@]} ]]; do
-            _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" "${tokens[$i]}" line_flags
-            i=$((i + 1))
-        done
-
-        if [[ -n "$prev_flag" ]]; then
-            local col_start
-            col_start="$(_token_offset "$line_text" "$prev_flag")"
-            diagnostics="$(_append_diagnostic "$diagnostics" \
-                "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
-                "$prev_flag requires a value")"
+        _resolve_directive_flags \
+            "$lineno" "$line_text" "$directive" bootloader_seen valid_flags
+        local rc=$?
+        if [[ $rc -eq 1 || $rc -eq 2 ]]; then
+            lineno=$((lineno + 1))
+            continue
         fi
+
+        # shellcheck disable=SC2034  # passed by name to _validate_tokens_on_line/_validate_line_logic
+        local -A line_flags=()
+        _validate_tokens_on_line \
+            "$lineno" "$line_text" "$directive" "$valid_flags" tokens line_flags
 
         _validate_line_logic "$lineno" "$line_text" "$directive" line_flags "$doc_ptable"
 
