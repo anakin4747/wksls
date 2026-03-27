@@ -1096,6 +1096,19 @@ validate_document() {
         stripped="${stripped%"${stripped##*[![:space:]]}"}"  # rtrim
         [[ -z "$stripped" ]] && { lineno=$((lineno + 1)); continue; }
 
+        # Check for an unclosed double quote: an odd number of " on the line
+        # means the last " opens a string that is never closed.
+        local quote_count="${stripped//[^\"]/}"
+        if (( ${#quote_count} % 2 != 0 )); then
+            col_start="${line_text%\"*}"
+            col_start="${#col_start}"
+            diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
+                "$col_start" $((col_start + 1)) \
+                "Unclosed double quote")"
+            lineno=$((lineno + 1))
+            continue
+        fi
+
         read -ra tokens <<< "$stripped"
         directive="${tokens[0]}"
 
