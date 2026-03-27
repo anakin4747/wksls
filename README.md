@@ -16,7 +16,7 @@ A Language Server Protocol (LSP) server for OpenEmbedded/Yocto
 
 ## Installation
 
-### Nix (recommended)
+### Nix
 
 Install directly from the flake into your profile:
 
