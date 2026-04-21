@@ -3,7 +3,7 @@
 PREFIX ?= /usr/local
 
 all:
-	nix develop --command make test lint
+	nix develop --extra-experimental-features 'nix-command flakes' --command make test lint
 
 dev:
 	st -e \
