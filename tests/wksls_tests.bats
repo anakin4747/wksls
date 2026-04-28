@@ -19,13 +19,11 @@ teardown() {
 }
 
 @test "initialize advertises openClose textDocumentSync" {
-    lsts_initialize
-    echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.textDocumentSync.openClose == true'
+    lsts_initialize_capability '.result.capabilities.textDocumentSync.openClose == true'
 }
 
 @test "initialize advertises full textDocumentSync change" {
-    lsts_initialize
-    echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.textDocumentSync.change == 1'
+    lsts_initialize_capability '.result.capabilities.textDocumentSync.change == 1'
 }
 
 @test "hover over bootloader returns documentation" {
@@ -365,8 +363,7 @@ teardown() {
 }
 
 @test "initialize advertises definitionProvider" {
-    lsts_initialize
-    echo "$LSTS_RESPONSE" | jq -e '.result.capabilities.definitionProvider == true'
+    lsts_initialize_capability '.result.capabilities.definitionProvider == true'
 }
 
 @test "definition on --source value finds plugin source file" {
@@ -601,16 +598,9 @@ teardown() {
     lsts_initialize
     lsts_open "fixtures/diagnostics_unknown_flag.wks"
     _lsts_recv_notification "textDocument/publishDiagnostics"
-    local uri="file://$LSTS_ROOT/fixtures/diagnostics_unknown_flag.wks"
-    local new_text
-    new_text="$(jq -Rs . <"$LSTS_ROOT/fixtures/diagnostics_unknown_directive.wks")"
-    lsts_notify "textDocument/didChange" \
-        "{\"textDocument\":{\"uri\":\"${uri}\",\"version\":2},\"contentChanges\":[{\"text\":${new_text}}]}"
-    _lsts_recv_notification "textDocument/publishDiagnostics"
-    echo "$LSTS_RESPONSE" | jq -e \
-        '(.params.diagnostics | length) == 1
-        and .params.diagnostics[0].severity == 1
-        and (.params.diagnostics[0].message | contains("blah"))'
+    lsts_change "fixtures/diagnostics_unknown_flag.wks" 2 \
+        "fixtures/diagnostics_unknown_directive.wks" \
+        "fixtures/diagnostics_unknown_directive_after_change.rpc.json"
 }
 
 @test "fails to start when jq is not installed" {
