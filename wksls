@@ -1255,7 +1255,9 @@ handle_definition() {
     if [[ -n "$plugin_name" ]]; then
         local_path="${uri#file://}"
         oe_root="$(find_oe_root "$local_path")" || true
-        [[ -n "$oe_root" ]] && target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
+        if [[ -n "$oe_root" ]]; then
+            target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
+        fi
     fi
     if [[ -n "$target" ]]; then
         target_uri="file://${target}"
