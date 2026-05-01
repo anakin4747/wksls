@@ -27,6 +27,7 @@
             bash
             bats
             jq
+            cocogitto
             shellcheck
             wksls
           ];
