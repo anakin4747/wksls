@@ -904,6 +904,14 @@ _validate_token() {
     fi
     prev_flag=""
 
+    if [[ "$tok" == -* && "$tok" != --* ]]; then
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "Unknown flag for $directive: $tok")"
+        return
+    fi
+
     [[ "$tok" == --* ]] || return
 
     flag_name="${tok%%=*}"

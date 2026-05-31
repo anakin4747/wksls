@@ -441,6 +441,12 @@ teardown() {
         "fixtures/diagnostics_unknown_flag.rpc.json"
 }
 
+@test "diagnostics on single dash flag reports error" {
+    lsts_diagnostics \
+        "fixtures/diagnostics_single_dash_flag.wks" \
+        "fixtures/diagnostics_single_dash_flag.rpc.json"
+}
+
 @test "diagnostics on invalid --fstype value reports error" {
     lsts_diagnostics \
         "fixtures/diagnostics_invalid_fstype.wks" \
