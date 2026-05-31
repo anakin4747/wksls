@@ -3,7 +3,7 @@
 	url = git@github.com:anakin4747/lsts.git
 [submodule "tests/yocto-docs"]
 	path = tests/yocto-docs
-	url = git://git.yoctoproject.org/yocto-docs
+	url = https://git.yoctoproject.org/yocto-docs
 [submodule "tests/openembedded-core"]
 	path = tests/openembedded-core
-	url = git://git.openembedded.org/openembedded-core
+	url = https://git.openembedded.org/openembedded-core
