@@ -9,6 +9,68 @@ A Language Server Protocol (LSP) server for OpenEmbedded/Yocto
 [Wic Kickstart](https://docs.yoctoproject.org/ref-manual/kickstart.html)
 (`.wks`) files.
 
+## Features
+
+### Hover
+
+Displays documentation for the keyword under the cursor.
+
+<div align="center">
+  <p>
+    <h4><a href="">Neovim Hover</a></h4>
+    <video controls muted src="" alt="Hovering over a WKS keyword in Neovim displays inline documentation from the language server"></video>
+  </p>
+  <p>
+    <h4><a href="">VS Code Hover</a></h4>
+    <video controls muted src="" alt="Hovering over a WKS keyword in VS Code displays inline documentation from the language server"></video>
+  </p>
+</div>
+
+### Completion
+
+Provides keyword and argument suggestions as you type.
+
+<div align="center">
+  <p>
+    <h4><a href="">Neovim Completion</a></h4>
+    <video controls muted src="" alt="Triggering completion in Neovim shows WKS keyword suggestions provided by the language server"></video>
+  </p>
+  <p>
+    <h4><a href="">VS Code Completion</a></h4>
+    <video controls muted src="" alt="Triggering completion in VS Code shows WKS keyword suggestions provided by the language server"></video>
+  </p>
+</div>
+
+### Diagnostics
+
+Reports syntax and semantic errors inline as you edit.
+
+<div align="center">
+  <p>
+    <h4><a href="">Neovim Diagnostics</a></h4>
+    <video controls muted src="" alt="Neovim displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
+  </p>
+  <p>
+    <h4><a href="">VS Code Diagnostics</a></h4>
+    <video controls muted src="" alt="VS Code displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
+  </p>
+</div>
+
+### Go-to Definition
+
+Jumps to the definition of the symbol under the cursor.
+
+<div align="center">
+  <p>
+    <h4><a href="">Neovim Go-to Definition</a></h4>
+    <video controls muted src="" alt="Using go-to definition in Neovim jumps to the definition of a WKS symbol via the language server"></video>
+  </p>
+  <p>
+    <h4><a href="">VS Code Go-to Definition</a></h4>
+    <video controls muted src="" alt="Using go-to definition in VS Code jumps to the definition of a WKS symbol via the language server"></video>
+  </p>
+</div>
+
 ## Dependencies
 
 - `bash` 4.0+
