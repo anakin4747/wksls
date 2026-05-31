@@ -1,16 +1,9 @@
-.PHONY: all dev test lint install install-manual uninstall-manual install-vscode-ext
+.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext
 
 PREFIX ?= /usr/local
 
 all:
 	nix develop --extra-experimental-features 'nix-command flakes' --command make test lint
-
-dev:
-	st -e \
-		nix develop --command \
-			nvim --clean \
-				-u $(CURDIR)/dev/init.lua \
-				$(CURDIR)/tests/openembedded-core/scripts/lib/wic/canned-wks/systemd-bootdisk.wks &
 
 lint:
 	shellcheck --external-sources --shell=bash wksls tests/*_tests.bats
