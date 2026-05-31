@@ -28,7 +28,7 @@ Displays documentation for the keyword under the cursor.
 
 ### Completion
 
-Provides keyword and argument suggestions as you type.
+Provides keyword and argument suggestions.
 
 <div align="center">
   <p>
@@ -43,7 +43,7 @@ Provides keyword and argument suggestions as you type.
 
 ### Diagnostics
 
-Reports syntax and semantic errors inline as you edit.
+Reports syntax and semantic errors inline.
 
 <div align="center">
   <p>
@@ -58,7 +58,7 @@ Reports syntax and semantic errors inline as you edit.
 
 ### Go-to Definition
 
-Jumps to the definition of the symbol under the cursor.
+Jumps to the definition of the wks plugins under the cursor.
 
 <div align="center">
   <p>
