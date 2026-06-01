@@ -28,10 +28,12 @@ uninstall:
 
 .PHONY: install-vscode-ext
 install-vscode-ext:
-	mkdir -p ~/.vscode/extensions/wksls-0.0.1
-	cp -r vscode-wksls/. ~/.vscode/extensions/wksls-0.0.1
+	version=$$(jq -r .version vscode-wksls/package.json); \
+	cd vscode-wksls && npm install && npx @vscode/vsce package --out "wksls-$$version.vsix" && \
+	code --install-extension "wksls-$$version.vsix"
 
 .PHONY: install-vscodium-ext
 install-vscodium-ext:
-	mkdir -p ~/.vscode-oss/extensions/wksls-0.0.1
-	cp -r vscode-wksls/. ~/.vscode-oss/extensions/wksls-0.0.1
+	version=$$(jq -r .version vscode-wksls/package.json); \
+	cd vscode-wksls && npm install && npx @vscode/vsce package --out "wksls-$$version.vsix" && \
+	codium --install-extension "wksls-$$version.vsix"

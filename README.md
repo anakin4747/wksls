@@ -131,25 +131,9 @@ vim.lsp.enable('wksls')
 The extension lives in the `vscode-wksls/` directory and must be installed
 separately from the language server.
 
-**VSCodium:**
-
 ```sh
-make install-vscode-ext
-```
-
-**VS Code:**
-
-```sh
-mkdir -p ~/.vscode/extensions/wksls-0.0.1
-cp -r vscode-wksls/. ~/.vscode/extensions/wksls-0.0.1
-```
-
-Or package and install a `.vsix`:
-
-```sh
-cd vscode-wksls
-npx @vscode/vsce package --allow-missing-publisher
-codium --install-extension wksls-0.0.1.vsix
+make install-vscode-ext     # VS Code
+make install-vscodium-ext   # VSCodium
 ```
 
 The extension expects `wksls` to be on your `PATH`. Install the language
