@@ -1067,14 +1067,6 @@ _resolve_directive_flags() {
     local -n _out_flags="$5"    # output: valid flags string
 
     case "$directive" in
-        bootloader|part|partition|include) ;;
-        *)
-            _tok_diagnostic "$lineno" "$line_text" "$directive" "Unknown directive: $directive"
-            return 1
-            ;;
-    esac
-
-    case "$directive" in
         bootloader)
             _bs_ref=$((_bs_ref + 1))
             if [[ $_bs_ref -gt 1 ]]; then
@@ -1087,6 +1079,10 @@ _resolve_directive_flags() {
             ;;
         include)
             return 2
+            ;;
+        *)
+            _tok_diagnostic "$lineno" "$line_text" "$directive" "Unknown directive: $directive"
+            return 1
             ;;
     esac
 }
