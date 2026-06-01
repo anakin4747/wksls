@@ -3,20 +3,18 @@ name: code-review
 description: Code review checklist. Use after creating a commit to review the quality of your changes.
 ---
 
-After creating a commit, review your work by asking:
+After creating a commit, review your work against these rules and fix any violations in new commits:
 
-- Did your change create any dead code?
-- Did your change invalidate any comments?
-- Is your change in the style of the codebase?
-- Can guard clauses be used to avoid indenting?
-- Can this code be refactored into a function to improve readability?
-- Is this commit atomic and only focused on one topic?
-- Did anything unrelated get included in the commit by accident?
-- Does this code reuse functionality already present in the codebase?
-- Did the commit duplicate any functionality already present in the codebase?
-- Is there a simpler way to implement this solution?
-- Did you add extra functionality that doesn't have a corresponding test?
+- Remove any dead code introduced by your change.
+- Update or remove comments invalidated by your change.
+- Match the style of the surrounding codebase.
+- Use guard clauses instead of indented branches where possible.
+- Extract repeated or complex logic into named functions to improve readability.
+- Keep each commit atomic and focused on one topic only.
+- Exclude any changes unrelated to the commit's topic.
+- Reuse existing functionality instead of reimplementing it.
+- Do not duplicate functionality already present in the codebase.
+- Prefer the simplest implementation that satisfies the requirements.
+- Every new piece of functionality must have a corresponding test.
 - Never commit with failing tests.
-- Avoid unneeded complexity.
-
-Fix any issues found in new commits.
+- Remove unneeded complexity.
