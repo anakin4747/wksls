@@ -1201,15 +1201,16 @@ handle_definition() {
             target="$(source_plugin_path "$oe_root" "$plugin_name")" || true
         fi
     fi
-    if [[ -n "$target" ]]; then
-        target_uri="file://${target}"
-        class_pos="$(plugin_class_position "$target")" || class_pos="0 0"
-        class_line="${class_pos% *}"
-        class_char="${class_pos#* }"
-        send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":${class_line},\"character\":${class_char}},\"end\":{\"line\":${class_line},\"character\":${class_char}}}}}"
-    else
+    if ! [[ -n "$target" ]]; then
         send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":null}"
+        return
     fi
+
+    target_uri="file://${target}"
+    class_pos="$(plugin_class_position "$target")" || class_pos="0 0"
+    class_line="${class_pos% *}"
+    class_char="${class_pos#* }"
+    send "{\"jsonrpc\":\"2.0\",\"id\":${id},\"result\":{\"uri\":$(jq -cn --arg u "$target_uri" '$u'),\"range\":{\"start\":{\"line\":${class_line},\"character\":${class_char}},\"end\":{\"line\":${class_line},\"character\":${class_char}}}}}"
 }
 
 handle_hover() {
