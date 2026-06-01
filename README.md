@@ -22,11 +22,11 @@ Displays documentation for the keyword under the cursor.
 <div align="center">
   <p>
     <h4>Neovim Hover</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/8afc132d-868a-43c5-a992-466ce34b52d0" alt="Hovering over a WKS keyword in Neovim displays inline documentation from the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/a65a4b95-05b8-4d44-b263-3399bb00b0f2" alt="Hovering over a WKS keyword in Neovim displays inline documentation from the language server"></video>
   </p>
   <p>
     <h4>VS Code Hover</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/67cf17be-5d8d-4c5d-abf4-b11261d01374" alt="Hovering over a WKS keyword in VS Code displays inline documentation from the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/fbfaa2ca-6d80-4621-b272-cf031b9c3e3e" alt="Hovering over a WKS keyword in VS Code displays inline documentation from the language server"></video>
   </p>
 </div>
 
@@ -37,11 +37,11 @@ Provides keyword and argument suggestions.
 <div align="center">
   <p>
     <h4>Neovim Completion</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/8b3a7d41-83eb-41db-a299-9f39fdc45bb2" alt="Triggering completion in Neovim shows WKS keyword suggestions provided by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/287f1e2c-f238-422e-a9c2-40014f04e7ca" alt="Triggering completion in Neovim shows WKS keyword suggestions provided by the language server"></video>
   </p>
   <p>
     <h4>VS Code Completion</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/78e762b7-5346-4901-8a4d-808c4c4d8c48" alt="Triggering completion in VS Code shows WKS keyword suggestions provided by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/530bfd3e-10b0-4b2f-9361-663a179df960" alt="Triggering completion in VS Code shows WKS keyword suggestions provided by the language server"></video>
   </p>
 </div>
 
@@ -52,11 +52,11 @@ Reports syntax and semantic errors inline.
 <div align="center">
   <p>
     <h4>Neovim Diagnostics</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/63401f71-e9b0-429e-9cb6-d8d0cf0d21ca" alt="Neovim displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/f57d95e8-8bd0-474c-b45b-3eb8617f53b7" alt="Neovim displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
   </p>
   <p>
     <h4>VS Code Diagnostics</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/51b164f2-e680-4ab3-b261-91a1e77b70a0" alt="VS Code displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/6b4a6997-17b2-4a73-8a7f-c0970c26e2ac" alt="VS Code displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
   </p>
 </div>
 
@@ -67,11 +67,11 @@ Jumps to the definition of the wks plugins under the cursor.
 <div align="center">
   <p>
     <h4>Neovim Go-to Definition</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/dfa29733-d55f-44a2-bdf0-2fbb7055173e" alt="Using go-to definition in Neovim jumps to the definition of a WKS symbol via the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/938675e1-d440-4e4f-a602-788ada4e06e9" alt="Using go-to definition in Neovim jumps to the definition of a WKS symbol via the language server"></video>
   </p>
   <p>
     <h4>VS Code Go-to Definition</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/2427e779-7589-469d-acd8-88f0d7237c75" alt="Using go-to definition in VS Code jumps to the definition of a WKS symbol via the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/b1b25ec2-3b62-4ea0-82a0-db2d5e41cd91" alt="Using go-to definition in VS Code jumps to the definition of a WKS symbol via the language server"></video>
   </p>
 </div>
 
