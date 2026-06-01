@@ -9,6 +9,10 @@ A Language Server Protocol (LSP) server for OpenEmbedded/Yocto
 [Wic Kickstart](https://docs.yoctoproject.org/ref-manual/kickstart.html)
 (`.wks`) files.
 
+This is a project that emphasizes simplicity. The application is a single shell
+script called `wksls`. The test suite is a single file called
+`tests/wksls_tests.bats`.
+
 ## Features
 
 ### Hover
