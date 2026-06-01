@@ -22,7 +22,7 @@ Displays documentation for the keyword under the cursor.
 <div align="center">
   <p>
     <h4>Neovim Hover</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/df5e4b82-f6ba-4055-aefa-5e5cb9015c03" alt="Hovering over a WKS keyword in Neovim displays inline documentation from the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/8afc132d-868a-43c5-a992-466ce34b52d0" alt="Hovering over a WKS keyword in Neovim displays inline documentation from the language server"></video>
   </p>
   <p>
     <h4>VS Code Hover</h4>
@@ -37,11 +37,11 @@ Provides keyword and argument suggestions.
 <div align="center">
   <p>
     <h4>Neovim Completion</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/f209746d-ee90-4ed3-8b2b-6f0ba5e57a33" alt="Triggering completion in Neovim shows WKS keyword suggestions provided by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/8b3a7d41-83eb-41db-a299-9f39fdc45bb2" alt="Triggering completion in Neovim shows WKS keyword suggestions provided by the language server"></video>
   </p>
   <p>
     <h4>VS Code Completion</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/aeb9459c-d946-44fa-984f-cb81df579b78" alt="Triggering completion in VS Code shows WKS keyword suggestions provided by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/78e762b7-5346-4901-8a4d-808c4c4d8c48" alt="Triggering completion in VS Code shows WKS keyword suggestions provided by the language server"></video>
   </p>
 </div>
 
@@ -52,7 +52,7 @@ Reports syntax and semantic errors inline.
 <div align="center">
   <p>
     <h4>Neovim Diagnostics</h4>
-    <video controls muted src="https://github.com/user-attachments/assets/c8e6b614-42d8-4ed2-ad0a-67cb7c4f63d0" alt="Neovim displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
+    <video controls muted src="https://github.com/user-attachments/assets/63401f71-e9b0-429e-9cb6-d8d0cf0d21ca" alt="Neovim displays inline error diagnostics for invalid WKS syntax reported by the language server"></video>
   </p>
   <p>
     <h4>VS Code Diagnostics</h4>
