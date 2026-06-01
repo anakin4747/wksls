@@ -816,6 +816,18 @@ _append_diagnostic() {
         }]'
 }
 
+# Emit a diagnostic whose range spans a single token located in line_text.
+# Updates the global `diagnostics` variable.
+# Usage: _tok_diagnostic <lineno> <line_text> <tok> <message>
+_tok_diagnostic() {
+    local lineno="$1" line_text="$2" tok="$3" message="$4"
+    local col_start
+    col_start="$(_token_offset "$line_text" "$tok")"
+    diagnostics="$(_append_diagnostic "$diagnostics" \
+        "$lineno" "$col_start" $((col_start + ${#tok})) \
+        "$message")"
+}
+
 # Validate a single enumerated flag value (--fstype or --ptable).
 # Updates the global `diagnostics` variable.
 # Usage: _validate_enum_value <lineno> <line_text> <flag_name> <value> <tok>
@@ -828,9 +840,7 @@ _validate_enum_value() {
         *) return ;;
     esac
     _in_list "$value" "$valid_list" && return
-    col_start="$(_token_offset "$line_text" "$tok")"
-    diagnostics="$(_append_diagnostic "$diagnostics" \
-        "$lineno" "$col_start" $((col_start + ${#tok})) "$msg")"
+    _tok_diagnostic "$lineno" "$line_text" "$tok" "$msg"
 }
 
 # Validate the value of a flag that takes a typed argument (size, int, float,
@@ -874,9 +884,7 @@ _validate_flag_value() {
     esac
 
     [[ -z "$msg" ]] && return
-    col_start="$(_token_offset "$line_text" "$tok")"
-    diagnostics="$(_append_diagnostic "$diagnostics" \
-        "$lineno" "$col_start" $((col_start + ${#tok})) "$msg")"
+    _tok_diagnostic "$lineno" "$line_text" "$tok" "$msg"
 }
 
 # Validate one token from a directive line.
@@ -887,7 +895,7 @@ _validate_flag_value() {
 _validate_token() {
     local lineno="$1" line_text="$2" directive="$3" valid_flags="$4" tok="$5"
     local -n _lf_ref="$6"
-    local col_start flag_name flag_value
+    local flag_name flag_value
 
     if [[ -n "$prev_flag" && "$tok" != --* ]]; then
         _validate_enum_value "$lineno" "$line_text" "$prev_flag" "$tok" "$tok"
@@ -897,18 +905,12 @@ _validate_token() {
         return
     fi
     if [[ -n "$prev_flag" ]]; then
-        col_start="$(_token_offset "$line_text" "$prev_flag")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
-            "$prev_flag requires a value")"
+        _tok_diagnostic "$lineno" "$line_text" "$prev_flag" "$prev_flag requires a value"
     fi
     prev_flag=""
 
     if [[ "$tok" == -* && "$tok" != --* ]]; then
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "Unknown flag for $directive: $tok")"
+        _tok_diagnostic "$lineno" "$line_text" "$tok" "Unknown flag for $directive: $tok"
         return
     fi
 
@@ -918,11 +920,8 @@ _validate_token() {
     flag_value="${tok#*=}"
     [[ "$flag_name" == "$tok" ]] && flag_value=""
 
-    col_start="$(_token_offset "$line_text" "$tok")"
     if ! _in_list "$flag_name" "$valid_flags"; then
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "Unknown flag for $directive: $flag_name")"
+        _tok_diagnostic "$lineno" "$line_text" "$tok" "Unknown flag for $directive: $flag_name"
         return
     fi
 
@@ -946,64 +945,39 @@ _validate_line_logic() {
     local lineno="$1" line_text="$2" directive="$3"
     local -n _lf="$4"
     local doc_ptable="${5:-msdos}"
-    local col_start tok
 
     [[ "$directive" == part || "$directive" == partition ]] || return 0
 
     # --size and --fixed-size are mutually exclusive.
     if [[ -v _lf[--size] && -v _lf[--fixed-size] ]]; then
-        tok="--fixed-size"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--size and --fixed-size are mutually exclusive")"
+        _tok_diagnostic "$lineno" "$line_text" "--fixed-size" "--size and --fixed-size are mutually exclusive"
     fi
 
     # --fixed-size is incompatible with --overhead-factor.
     if [[ -v _lf[--fixed-size] && -v _lf[--overhead-factor] ]]; then
-        tok="--overhead-factor"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--overhead-factor cannot be used with --fixed-size")"
+        _tok_diagnostic "$lineno" "$line_text" "--overhead-factor" "--overhead-factor cannot be used with --fixed-size"
     fi
 
     # --fixed-size is incompatible with --extra-filesystem-space.
     if [[ -v _lf[--fixed-size] && -v _lf[--extra-filesystem-space] ]]; then
-        tok="--extra-filesystem-space"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--extra-filesystem-space cannot be used with --fixed-size")"
+        _tok_diagnostic "$lineno" "$line_text" "--extra-filesystem-space" "--extra-filesystem-space cannot be used with --fixed-size"
     fi
 
     local fstype="${_lf[--fstype]:-}"
 
     # squashfs and erofs do not support --label.
     if [[ "$fstype" == squashfs || "$fstype" == erofs ]] && [[ -v _lf[--label] ]]; then
-        tok="--label"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--label is not supported with --fstype $fstype")"
+        _tok_diagnostic "$lineno" "$line_text" "--label" "--label is not supported with --fstype $fstype"
     fi
 
     # squashfs does not support --fsuuid.
     if [[ "$fstype" == squashfs ]] && [[ -v _lf[--fsuuid] ]]; then
-        tok="--fsuuid"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--fsuuid is not supported with --fstype squashfs")"
+        _tok_diagnostic "$lineno" "$line_text" "--fsuuid" "--fsuuid is not supported with --fstype squashfs"
     fi
 
     # --use-label requires --label.
     if [[ -v _lf[--use-label] && ! -v _lf[--label] ]]; then
-        tok="--use-label"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--use-label requires --label")"
+        _tok_diagnostic "$lineno" "$line_text" "--use-label" "--use-label requires --label"
     fi
 
     # --use-uuid and --uuid are contradictory: --use-uuid generates a
@@ -1013,51 +987,27 @@ _validate_line_logic() {
     # --use-uuid prefix.
     if [[ -v _lf[--use-uuid] && -v _lf[--uuid] ]]; then
         local uuid_val="${_lf[--uuid]}"
-        if [[ -n "$uuid_val" ]]; then
-            tok="--uuid=${uuid_val}"
-        else
-            tok="--uuid"
-        fi
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--uuid cannot be used together with --use-uuid")"
+        _tok_diagnostic "$lineno" "$line_text" "--uuid${uuid_val:+=$uuid_val}" "--uuid cannot be used together with --use-uuid"
     fi
 
     # --sourceparams is only meaningful when --source is also given.
     if [[ -v _lf[--sourceparams] && ! -v _lf[--source] ]]; then
-        tok="--sourceparams"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--sourceparams requires --source")"
+        _tok_diagnostic "$lineno" "$line_text" "--sourceparams" "--sourceparams requires --source"
     fi
 
     # --part-name is GPT-only; msdos does not support named partitions.
     if [[ "$doc_ptable" == msdos && -v _lf[--part-name] ]]; then
-        tok="--part-name"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--part-name is not supported with msdos partition table")"
+        _tok_diagnostic "$lineno" "$line_text" "--part-name" "--part-name is not supported with msdos partition table"
     fi
 
     # --part-type is GPT-only; msdos does not support custom partition types.
     if [[ "$doc_ptable" == msdos && -v _lf[--part-type] ]]; then
-        tok="--part-type"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--part-type is not supported with msdos partition table")"
+        _tok_diagnostic "$lineno" "$line_text" "--part-type" "--part-type is not supported with msdos partition table"
     fi
 
     # --mbr requires a gpt-hybrid partition table.
     if [[ -v _lf[--mbr] && "$doc_ptable" != gpt-hybrid ]]; then
-        tok="--mbr"
-        col_start="$(_token_offset "$line_text" "$tok")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#tok})) \
-            "--mbr requires a gpt-hybrid partition table (got $doc_ptable)")"
+        _tok_diagnostic "$lineno" "$line_text" "--mbr" "--mbr requires a gpt-hybrid partition table (got $doc_ptable)"
     fi
 }
 
@@ -1115,15 +1065,11 @@ _resolve_directive_flags() {
     local lineno="$1" line_text="$2" directive="$3"
     local -n _bs_ref="$4"       # bootloader_seen (integer, passed by name)
     local -n _out_flags="$5"    # output: valid flags string
-    local col_start
 
     case "$directive" in
         bootloader|part|partition|include) ;;
         *)
-            col_start="$(_token_offset "$line_text" "$directive")"
-            diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                "$col_start" $((col_start + ${#directive})) \
-                "Unknown directive: $directive")"
+            _tok_diagnostic "$lineno" "$line_text" "$directive" "Unknown directive: $directive"
             return 1
             ;;
     esac
@@ -1132,10 +1078,7 @@ _resolve_directive_flags() {
         bootloader)
             _bs_ref=$((_bs_ref + 1))
             if [[ $_bs_ref -gt 1 ]]; then
-                col_start="$(_token_offset "$line_text" "bootloader")"
-                diagnostics="$(_append_diagnostic "$diagnostics" "$lineno" \
-                    "$col_start" $((col_start + ${#directive})) \
-                    "Only one bootloader directive is allowed")"
+                _tok_diagnostic "$lineno" "$line_text" "bootloader" "Only one bootloader directive is allowed"
             fi
             _out_flags="$BOOTLOADER_FLAGS"
             ;;
@@ -1156,7 +1099,7 @@ _validate_tokens_on_line() {
     local -n _vt_tokens="$5"    # tokens array, passed by name
     local -n _vt_flags="$6"     # line_flags assoc array, passed by name
 
-    local i=1 prev_flag="" col_start
+    local i=1 prev_flag=""
     while [[ $i -lt ${#_vt_tokens[@]} ]]; do
         _validate_token "$lineno" "$line_text" "$directive" "$valid_flags" \
             "${_vt_tokens[$i]}" _vt_flags
@@ -1164,10 +1107,7 @@ _validate_tokens_on_line() {
     done
 
     if [[ -n "$prev_flag" ]]; then
-        col_start="$(_token_offset "$line_text" "$prev_flag")"
-        diagnostics="$(_append_diagnostic "$diagnostics" \
-            "$lineno" "$col_start" $((col_start + ${#prev_flag})) \
-            "$prev_flag requires a value")"
+        _tok_diagnostic "$lineno" "$line_text" "$prev_flag" "$prev_flag requires a value"
     fi
 }
 
