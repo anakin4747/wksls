@@ -948,119 +948,117 @@ _validate_line_logic() {
     local doc_ptable="${5:-msdos}"
     local col_start tok
 
-    case "$directive" in
-        part|partition)
-            # --size and --fixed-size are mutually exclusive.
-            if [[ -v _lf[--size] && -v _lf[--fixed-size] ]]; then
-                tok="--fixed-size"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--size and --fixed-size are mutually exclusive")"
-            fi
+    [[ "$directive" == part || "$directive" == partition ]] || return 0
 
-            # --fixed-size is incompatible with --overhead-factor.
-            if [[ -v _lf[--fixed-size] && -v _lf[--overhead-factor] ]]; then
-                tok="--overhead-factor"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--overhead-factor cannot be used with --fixed-size")"
-            fi
+    # --size and --fixed-size are mutually exclusive.
+    if [[ -v _lf[--size] && -v _lf[--fixed-size] ]]; then
+        tok="--fixed-size"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--size and --fixed-size are mutually exclusive")"
+    fi
 
-            # --fixed-size is incompatible with --extra-filesystem-space.
-            if [[ -v _lf[--fixed-size] && -v _lf[--extra-filesystem-space] ]]; then
-                tok="--extra-filesystem-space"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--extra-filesystem-space cannot be used with --fixed-size")"
-            fi
+    # --fixed-size is incompatible with --overhead-factor.
+    if [[ -v _lf[--fixed-size] && -v _lf[--overhead-factor] ]]; then
+        tok="--overhead-factor"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--overhead-factor cannot be used with --fixed-size")"
+    fi
 
-            local fstype="${_lf[--fstype]:-}"
+    # --fixed-size is incompatible with --extra-filesystem-space.
+    if [[ -v _lf[--fixed-size] && -v _lf[--extra-filesystem-space] ]]; then
+        tok="--extra-filesystem-space"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--extra-filesystem-space cannot be used with --fixed-size")"
+    fi
 
-            # squashfs and erofs do not support --label.
-            if [[ "$fstype" == squashfs || "$fstype" == erofs ]] && [[ -v _lf[--label] ]]; then
-                tok="--label"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--label is not supported with --fstype $fstype")"
-            fi
+    local fstype="${_lf[--fstype]:-}"
 
-            # squashfs does not support --fsuuid.
-            if [[ "$fstype" == squashfs ]] && [[ -v _lf[--fsuuid] ]]; then
-                tok="--fsuuid"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--fsuuid is not supported with --fstype squashfs")"
-            fi
+    # squashfs and erofs do not support --label.
+    if [[ "$fstype" == squashfs || "$fstype" == erofs ]] && [[ -v _lf[--label] ]]; then
+        tok="--label"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--label is not supported with --fstype $fstype")"
+    fi
 
-            # --use-label requires --label.
-            if [[ -v _lf[--use-label] && ! -v _lf[--label] ]]; then
-                tok="--use-label"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--use-label requires --label")"
-            fi
+    # squashfs does not support --fsuuid.
+    if [[ "$fstype" == squashfs ]] && [[ -v _lf[--fsuuid] ]]; then
+        tok="--fsuuid"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--fsuuid is not supported with --fstype squashfs")"
+    fi
 
-            # --use-uuid and --uuid are contradictory: --use-uuid generates a
-            # UUID automatically, so supplying --uuid at the same time makes no
-            # sense.  Build the search token as --uuid=<value> when a value is
-            # present so that _token_offset does not accidentally match the
-            # --use-uuid prefix.
-            if [[ -v _lf[--use-uuid] && -v _lf[--uuid] ]]; then
-                local uuid_val="${_lf[--uuid]}"
-                if [[ -n "$uuid_val" ]]; then
-                    tok="--uuid=${uuid_val}"
-                else
-                    tok="--uuid"
-                fi
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--uuid cannot be used together with --use-uuid")"
-            fi
+    # --use-label requires --label.
+    if [[ -v _lf[--use-label] && ! -v _lf[--label] ]]; then
+        tok="--use-label"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--use-label requires --label")"
+    fi
 
-            # --sourceparams is only meaningful when --source is also given.
-            if [[ -v _lf[--sourceparams] && ! -v _lf[--source] ]]; then
-                tok="--sourceparams"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--sourceparams requires --source")"
-            fi
+    # --use-uuid and --uuid are contradictory: --use-uuid generates a
+    # UUID automatically, so supplying --uuid at the same time makes no
+    # sense.  Build the search token as --uuid=<value> when a value is
+    # present so that _token_offset does not accidentally match the
+    # --use-uuid prefix.
+    if [[ -v _lf[--use-uuid] && -v _lf[--uuid] ]]; then
+        local uuid_val="${_lf[--uuid]}"
+        if [[ -n "$uuid_val" ]]; then
+            tok="--uuid=${uuid_val}"
+        else
+            tok="--uuid"
+        fi
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--uuid cannot be used together with --use-uuid")"
+    fi
 
-            # --part-name is GPT-only; msdos does not support named partitions.
-            if [[ "$doc_ptable" == msdos && -v _lf[--part-name] ]]; then
-                tok="--part-name"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--part-name is not supported with msdos partition table")"
-            fi
+    # --sourceparams is only meaningful when --source is also given.
+    if [[ -v _lf[--sourceparams] && ! -v _lf[--source] ]]; then
+        tok="--sourceparams"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--sourceparams requires --source")"
+    fi
 
-            # --part-type is GPT-only; msdos does not support custom partition types.
-            if [[ "$doc_ptable" == msdos && -v _lf[--part-type] ]]; then
-                tok="--part-type"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--part-type is not supported with msdos partition table")"
-            fi
+    # --part-name is GPT-only; msdos does not support named partitions.
+    if [[ "$doc_ptable" == msdos && -v _lf[--part-name] ]]; then
+        tok="--part-name"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--part-name is not supported with msdos partition table")"
+    fi
 
-            # --mbr requires a gpt-hybrid partition table.
-            if [[ -v _lf[--mbr] && "$doc_ptable" != gpt-hybrid ]]; then
-                tok="--mbr"
-                col_start="$(_token_offset "$line_text" "$tok")"
-                diagnostics="$(_append_diagnostic "$diagnostics" \
-                    "$lineno" "$col_start" $((col_start + ${#tok})) \
-                    "--mbr requires a gpt-hybrid partition table (got $doc_ptable)")"
-            fi
-            ;;
-    esac
+    # --part-type is GPT-only; msdos does not support custom partition types.
+    if [[ "$doc_ptable" == msdos && -v _lf[--part-type] ]]; then
+        tok="--part-type"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--part-type is not supported with msdos partition table")"
+    fi
+
+    # --mbr requires a gpt-hybrid partition table.
+    if [[ -v _lf[--mbr] && "$doc_ptable" != gpt-hybrid ]]; then
+        tok="--mbr"
+        col_start="$(_token_offset "$line_text" "$tok")"
+        diagnostics="$(_append_diagnostic "$diagnostics" \
+            "$lineno" "$col_start" $((col_start + ${#tok})) \
+            "--mbr requires a gpt-hybrid partition table (got $doc_ptable)")"
+    fi
 }
 
 # Pre-scan document text and return the --ptable value from the bootloader
