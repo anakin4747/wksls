@@ -290,43 +290,43 @@ teardown() {
         "fixtures/hover_source_rawcopy.rpc.json"
 }
 
-@test "hover over --source bootimg-efi (dash) returns plugin documentation" {
+@test "hover over --source bootimg-efi with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:1:17" \
         "fixtures/hover_source_bootimg_efi.rpc.json"
 }
 
-@test "hover over --source bootimg-partition (dash) returns plugin documentation" {
+@test "hover over --source bootimg-partition with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:2:17" \
         "fixtures/hover_source_bootimg_partition.rpc.json"
 }
 
-@test "hover over --source bootimg-pcbios (dash) returns plugin documentation" {
+@test "hover over --source bootimg-pcbios with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:3:17" \
         "fixtures/hover_source_bootimg_pcbios.rpc.json"
 }
 
-@test "hover over --source bootimg-biosplusefi (dash) returns plugin documentation" {
+@test "hover over --source bootimg-biosplusefi with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:4:17" \
         "fixtures/hover_source_bootimg_biosplusefi.rpc.json"
 }
 
-@test "hover over --source extra-partition (dash) returns plugin documentation" {
+@test "hover over --source extra-partition with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:5:17" \
         "fixtures/hover_source_extra_partition.rpc.json"
 }
 
-@test "hover over --source isoimage-isohybrid (dash) returns plugin documentation" {
+@test "hover over --source isoimage-isohybrid with a dash returns plugin documentation" {
     lsts_hover \
         "fixtures/hover_source_plugins_dash.wks:6:17" \
         "fixtures/hover_source_isoimage_isohybrid.rpc.json"
 }
 
-@test "definition on --source bootimg-efi (dash) finds plugin source file" {
+@test "definition on --source bootimg-efi with a dash finds plugin source file" {
     lsts_definition \
         "oe-fixture/scripts/lib/wic/canned-wks/wksls-bootimg-efi-dash.wks:1:26" \
         "fixtures/definition_bootimg_efi_oe_fixture.rpc.json"
