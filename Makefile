@@ -1,4 +1,4 @@
-.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext install-vscodium-ext
+.PHONY: all test lint install uninstall install-vscode-ext install-vscodium-ext
 
 PREFIX ?= /usr/local
 
@@ -12,12 +12,9 @@ test:
 	bats --formatter $(CURDIR)/wksls-format-pretty tests/*_tests.bats
 
 install:
-	nix profile install .
-
-install-manual:
 	install -m 755 wksls $(PREFIX)/bin/wksls
 
-uninstall-manual:
+uninstall:
 	rm -f $(PREFIX)/bin/wksls
 
 install-vscode-ext:

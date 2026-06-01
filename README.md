@@ -95,17 +95,17 @@ nix profile install github:anakin4747/wksls
 Requires `bash` and `jq` to be on your `PATH`.
 
 ```sh
-make install-manual          # installs to /usr/local/bin
+make install          # installs to /usr/local/bin
 # or with a custom prefix:
-make install-manual PREFIX=~/.local
+make install PREFIX=~/.local
 ```
 
 To uninstall:
 
 ```sh
-make uninstall-manual
+make uninstall
 # or:
-make uninstall-manual PREFIX=~/.local
+make uninstall PREFIX=~/.local
 ```
 
 ## Editor configuration
