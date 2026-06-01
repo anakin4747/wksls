@@ -1,4 +1,4 @@
-.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext
+.PHONY: all test lint install install-manual uninstall-manual install-vscode-ext install-vscodium-ext
 
 PREFIX ?= /usr/local
 
@@ -21,5 +21,9 @@ uninstall-manual:
 	rm -f $(PREFIX)/bin/wksls
 
 install-vscode-ext:
+	mkdir -p ~/.vscode/extensions/wksls-0.0.1
+	cp -r vscode-wksls/. ~/.vscode/extensions/wksls-0.0.1
+
+install-vscodium-ext:
 	mkdir -p ~/.vscode-oss/extensions/wksls-0.0.1
 	cp -r vscode-wksls/. ~/.vscode-oss/extensions/wksls-0.0.1
