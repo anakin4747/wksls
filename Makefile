@@ -13,6 +13,11 @@ lint:
 test:
 	bats --formatter $(CURDIR)/wksls-format-pretty tests/*_tests.bats
 
+.PHONY: release
+release:
+	nix develop --extra-experimental-features 'nix-command flakes' --command cog bump --auto
+	git push --follow-tags
+
 .PHONY: install
 install:
 	install -m 755 wksls $(PREFIX)/bin/wksls

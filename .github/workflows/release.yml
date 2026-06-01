@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v27
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build and test
+        run: make
+
+      - name: Package VS Code extension
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          cd vscode-wksls
+          jq ".version = \"$version\"" package.json > p.json && mv p.json package.json
+          npm install
+          npx @vscode/vsce package --out "wksls-$version.vsix"
+
+      - name: Generate release notes
+        run: awk '/^## /{c++} c==1' CHANGELOG.md > _release_notes.md
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file _release_notes.md \
+            ./wksls \
+            "vscode-wksls/wksls-$version.vsix"
