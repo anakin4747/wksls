@@ -1,0 +1,6 @@
+part / --source bootimg-efi
+part / --source bootimg-partition
+part / --source bootimg-pcbios
+part / --source bootimg-biosplusefi
+part / --source extra-partition
+part / --source isoimage-isohybrid

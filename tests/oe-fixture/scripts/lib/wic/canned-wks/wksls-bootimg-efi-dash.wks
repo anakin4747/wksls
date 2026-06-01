@@ -1,0 +1,1 @@
+part /boot --source bootimg-efi --ondisk sda --label msdos --active --align 1024

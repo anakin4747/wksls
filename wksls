@@ -195,7 +195,7 @@ source_value_at() {
     if [[ "$flag" == "--source" ]]; then
         local TOKEN WORD
         _token_at "$text" "$line" "$character"
-        printf '%s' "${TOKEN#*=}"
+        printf '%s' "${TOKEN#*=}" | tr '-' '_'
         return 0
     fi
     # Check --source <name> form (cursor on space-separated value).
@@ -204,7 +204,7 @@ source_value_at() {
         local TOKEN WORD
         _token_at "$text" "$line" "$character"
         # TOKEN is the plugin name (strip any =value suffix just in case).
-        printf '%s' "${TOKEN%%=*}"
+        printf '%s' "${TOKEN%%=*}" | tr '-' '_'
         return 0
     fi
     return 1
