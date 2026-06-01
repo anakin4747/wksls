@@ -1,10 +1,11 @@
-# Git Best Practices
+---
+name: git
+description: Git best practices and commit workflow. Use when making commits or managing git history.
+---
 
 - Commit often with small, focused commits.
 - Use clear, imperative commit messages.
-- Commit every logical atomic addition or change. Each commit should represent
-  one coherent unit of work (e.g. add a helper function, fix a bug, update the
-  flake). Do not batch unrelated changes into a single commit.
+- Each commit should represent one coherent unit of work (e.g. add a helper function, fix a bug, update the flake). Do not batch unrelated changes into a single commit.
 - Exclude build artifacts and sensitive files via .gitignore.
 - Never commit passwords or API keys.
 - Never leave trailing whitespace.

@@ -1,4 +1,7 @@
-# Code Review
+---
+name: code-review
+description: Code review checklist. Use after creating a commit to review the quality of your changes.
+---
 
 After creating a commit, review your work by asking:
 
