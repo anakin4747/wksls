@@ -9,7 +9,7 @@ lint:
 	shellcheck --external-sources --shell=bash wksls tests/*_tests.bats
 
 test:
-	PATH="$(CURDIR):$$PATH" bats --formatter $(CURDIR)/wksls-format-pretty tests/*_tests.bats
+	bats --formatter $(CURDIR)/wksls-format-pretty tests/*_tests.bats
 
 install:
 	nix profile install .
