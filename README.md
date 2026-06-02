@@ -136,6 +136,8 @@ make install-vscode-ext     # VS Code
 make install-vscodium-ext   # VSCodium
 ```
 
+Or install the `wksls-*.vsix` file from the GitHub releases.
+
 The extension expects `wksls` to be on your `PATH`. Install the language
 server first using one of the methods above.
 
