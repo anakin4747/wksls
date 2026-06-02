@@ -82,20 +82,14 @@ Jumps to the definition of the wks plugins under the cursor.
 
 ## Installation
 
-### Nix
-
-Install directly from the flake into your profile:
-
-```sh
-nix profile install github:anakin4747/wksls
-```
-
 ### Manual
 
 Requires `bash` and `jq` to be on your `PATH`.
 
 ```sh
-make install          # installs to /usr/local/bin
+git clone https://github.com/anakin4747/wksls
+cd wksls
+make install
 # or with a custom prefix:
 make install PREFIX=~/.local
 ```
@@ -106,6 +100,20 @@ To uninstall:
 make uninstall
 # or:
 make uninstall PREFIX=~/.local
+```
+
+### Nix
+
+Install directly from the flake into your profile:
+
+```sh
+nix profile add github:anakin4747/wksls
+```
+
+To uninstall:
+
+```sh
+nix profile remove wksls
 ```
 
 ## Editor configuration
