@@ -1,0 +1,176 @@
+# Changelog
+All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
+
+- - -
+## [v0.1.0](https://github.com/anakin4747/wksls/compare/7949509e3db1946974fee8fc81c5767f5fa90f88..v0.1.0) - 2026-06-02
+#### Features
+- add `make install-vscodium-ext` - ([6016829](https://github.com/anakin4747/wksls/commit/60168296b77caead799454a4dfcbb928e0c30772)) - Anakin Childerhose
+- normalise dash to underscore in source plugin names - ([ad118a3](https://github.com/anakin4747/wksls/commit/ad118a397f52841e79b08c0c7aeb0387825604c4)) - Anakin Childerhose
+- diagnose single-dash flags as unknown - ([5cea4df](https://github.com/anakin4747/wksls/commit/5cea4df5ab9e4395d95b9b855dcae6e96f5c1ab3)) - Anakin Childerhose
+- validate --timeout value is a plain integer - ([753ab4e](https://github.com/anakin4747/wksls/commit/753ab4ed8b83d90a7dc30b0fee7fa6a2ea9d45e8)) - Anakin Childerhose
+- diagnose unclosed double quotes - ([c36fa3d](https://github.com/anakin4747/wksls/commit/c36fa3d6287f9a869e0b0c49668551ba01a3d534)) - Anakin Childerhose
+- add hover documentation for mntpoint argument - ([6ac66a9](https://github.com/anakin4747/wksls/commit/6ac66a9b5511cbd6e1478a28cf15d09d8c94603c)) - Anakin Childerhose
+- warn on all flags used without a required argument - ([2ebd33c](https://github.com/anakin4747/wksls/commit/2ebd33ce79d74391700b9933cb810e9e9574027b)) - Anakin Childerhose
+- diagnose --label without a value - ([e40dde1](https://github.com/anakin4747/wksls/commit/e40dde1878cf98e55851ec80ef4ad8c001ea435d)) - Anakin Childerhose
+- add cross-line ptable diagnostics for --part-name, --part-type, --mbr - ([0bcd21b](https://github.com/anakin4747/wksls/commit/0bcd21bc71722faf0546e0f370ccc44903711e89)) - Anakin Childerhose
+- add typed-value and same-line cross-flag diagnostics - ([e15362e](https://github.com/anakin4747/wksls/commit/e15362ecb16e498027719509330dae5326670857)) - Anakin Childerhose
+- add logical error diagnostics for cross-flag constraints - ([7c75716](https://github.com/anakin4747/wksls/commit/7c75716929302e2c6d26830081f6b52b3c8197f9)) - Anakin Childerhose
+- implement textDocument/publishDiagnostics with WKS syntax validation - ([8684efc](https://github.com/anakin4747/wksls/commit/8684efcc63b17f0e5c4e29171feee2605fe364f7)) - Anakin Childerhose
+- add manual install/uninstall and vscode-ext install targets - ([4055418](https://github.com/anakin4747/wksls/commit/40554182b7e09e9b592998f6e44fa19f16d34969)) - Anakin Childerhose
+- add VS Code extension skeleton for wksls - ([50f52ca](https://github.com/anakin4747/wksls/commit/50f52ca5bec5c5a27270751c703e4288ec2c5289)) - Anakin Childerhose
+- add hover documentation for all 9 source plugin values - ([2342e7c](https://github.com/anakin4747/wksls/commit/2342e7c3435bdc4316c95d0994286d96caa14050)) - Anakin Childerhose
+- scope completion to directive — bootloader vs part flags - ([b818673](https://github.com/anakin4747/wksls/commit/b81867338b15692f2689f5e59b04d0532e0d1feb)) - Anakin Childerhose
+- implement textDocument/definition for --source plugin values - ([82ac0d1](https://github.com/anakin4747/wksls/commit/82ac0d16c7ae2d7c3da324df1da35bfb41486fae)) - Anakin Childerhose
+- add ftplugin for wks filetype - ([01dad78](https://github.com/anakin4747/wksls/commit/01dad783404a90e23bec2090c8766e046d491bc1)) - Anakin Childerhose
+- context-aware completion — keywords at line start, flags mid-line - ([346b0ea](https://github.com/anakin4747/wksls/commit/346b0ea09a570f6e80a49632aa38d02ec77d6b8c)) - Anakin Childerhose
+- implement textDocument/completion returning all keywords and flags - ([90fcc84](https://github.com/anakin4747/wksls/commit/90fcc8401ae1c30f46864c0a06cc53deaebe38a4)) - Anakin Childerhose
+- implement textDocument/didChange with full-sync text update - ([812f354](https://github.com/anakin4747/wksls/commit/812f35442a814f65ba25f300b0e219dc9c4bde61)) - Anakin Childerhose
+- add --rootfs hover and efi/msdos fstype values - ([47a1041](https://github.com/anakin4747/wksls/commit/47a1041991619f6127e66b92c75ab2421901f975)) - Anakin Childerhose
+- add hover support for --sourceparams and --rootfs-dir - ([453232a](https://github.com/anakin4747/wksls/commit/453232a087c196cccfdb72ae6b1b5af3640772ee)) - Anakin Childerhose
+- check for jq on startup and error if missing - ([be15ac9](https://github.com/anakin4747/wksls/commit/be15ac9493090e8881eee6628555eb0a7ea726b6)) - Anakin Childerhose
+- implement textdocument/hover for all wks options - ([8eadebf](https://github.com/anakin4747/wksls/commit/8eadebf1951632c45ccc82c1f73199e10075013b)) - Anakin Childerhose
+- implement textdocument/hover for part and partition commands - ([f322c57](https://github.com/anakin4747/wksls/commit/f322c5750016ca2edb07ff7f3371028f6028130a)) - Anakin Childerhose
+- implement textdocument/hover for the bootloader keyword - ([a709223](https://github.com/anakin4747/wksls/commit/a709223609ed45c4cc3636a9c62d6b4b785080dc)) - Anakin Childerhose
+- implement lsp initialize handshake in wksls - ([5bbf1c7](https://github.com/anakin4747/wksls/commit/5bbf1c7438da6387f20a200f9afc149cabd67c3a)) - Anakin Childerhose
+#### Bug Fixes
+- vscode and codium installation targets - ([acc4213](https://github.com/anakin4747/wksls/commit/acc421349fe799db796916ef56fe226b1f03f5fa)) - Anakin Childerhose
+- add CURDIR to PATH in test target so wksls is found in CI - ([941dbc6](https://github.com/anakin4747/wksls/commit/941dbc686d05fefc668056274f8e8eb21c049922)) - Anakin Childerhose
+- reword video captions - ([506acb3](https://github.com/anakin4747/wksls/commit/506acb339c4686ff776afc9ae49456cf2a116709)) - Anakin Childerhose
+- use https for openembedded and yocto submodule URLs - ([8cee850](https://github.com/anakin4747/wksls/commit/8cee8505e1707d79a6a434cd93e3c9fed6c56695)) - Anakin Childerhose
+- replace && || true with if-then to satisfy shellcheck SC2015 - ([03eccd7](https://github.com/anakin4747/wksls/commit/03eccd746d081733329f0b6c6fe23d677fd7d229)) - anakin4747r2d2
+- correct oe-fixture plugins symlink depth - ([6607d4b](https://github.com/anakin4747/wksls/commit/6607d4bd3848e1e12401c0e257eb1800024b9b5b)) - anakin4747r2d2
+- displaced comment and inline target initialisation in handle_definition - ([63b9745](https://github.com/anakin4747/wksls/commit/63b974514e68cc9c55ba32f609a68c366f84357a)) - Anakin Childerhose
+- offer keyword completions when cursor is on an unrecognised first token - ([36363c2](https://github.com/anakin4747/wksls/commit/36363c2de79a5707a81254af2dcc443b49ace270)) - Anakin Childerhose
+- use static fixture file for definition test - ([e5b5274](https://github.com/anakin4747/wksls/commit/e5b52746573bae168d501072178346a54b8cb94b)) - Anakin Childerhose
+- point definition to plugin class name, clean up test to use lsts_definition - ([6ff08c8](https://github.com/anakin4747/wksls/commit/6ff08c8873362db7ceafd83bf9c3d6838f8dca71)) - Anakin Childerhose
+- add trailing newline to completion_--source fixture - ([8781e8b](https://github.com/anakin4747/wksls/commit/8781e8bbadf50b0b4bd88c20e49c1ba5d604d789)) - Anakin Childerhose
+- correct completion context detection - ([31a5451](https://github.com/anakin4747/wksls/commit/31a545147073425416e6e18a40868107f2441c4e)) - Anakin Childerhose
+- syntax highlighting gaps in syntax/wks.vim - ([82d858e](https://github.com/anakin4747/wksls/commit/82d858ed13adbccd7c832767c9973f7fe655fe9c)) - Anakin Childerhose
+- complete flag values when cursor is on space after 'flag=' - ([3f5eb7d](https://github.com/anakin4747/wksls/commit/3f5eb7de5b1507efdf858eac6c8b6f998a2656f5)) - Anakin Childerhose
+- complete flag value completion for --fstype and --ptable - ([396ade7](https://github.com/anakin4747/wksls/commit/396ade76748ea84c9b414e09b0b080a0241f828b)) - Anakin Childerhose
+- strip =value suffix in word_at so --opt=val hovers correctly - ([809fa10](https://github.com/anakin4747/wksls/commit/809fa10127ccf2e85ceff262adc6bc43af011023)) - Anakin Childerhose
+- use wksls from PATH instead of hardcoded source path - ([2cf3301](https://github.com/anakin4747/wksls/commit/2cf330161f69373cf1446876a254d88e2697970b)) - Anakin Childerhose
+- word_at to handle tab-separated tokens - ([aa2d44b](https://github.com/anakin4747/wksls/commit/aa2d44b32ef0661a71bc3a27fcb490acc50b0066)) - Anakin Childerhose
+- advertise openClose in textDocumentSync capability - ([bf293bc](https://github.com/anakin4747/wksls/commit/bf293bce4c44f9535a73f561e18adb43179b01a0)) - Anakin Childerhose
+- update fixture for Command: bootloader - ([054cd7c](https://github.com/anakin4747/wksls/commit/054cd7c7cb8c946971b7651cb8cdbd2a95513982)) - Anakin Childerhose
+#### Documentation
+- add message about simplicity - ([a5fceeb](https://github.com/anakin4747/wksls/commit/a5fceeb58aec07ea9dcf427cdc9d0ea2e248ddaf)) - Anakin Childerhose
+- strictly enforce all code review rules with mandatory re-review on failure - ([e012f3a](https://github.com/anakin4747/wksls/commit/e012f3acbde17c4d3455ca8dde5a4976421c306e)) - Anakin Childerhose
+- add documentation skill for avoiding content duplication in markdown - ([dab7267](https://github.com/anakin4747/wksls/commit/dab726732c825a4f9a6cb438968b9f814443207d)) - Anakin Childerhose
+- add cocogitto conventional commit guidance to git skill - ([0750529](https://github.com/anakin4747/wksls/commit/0750529a16ec0863c2fb134c97f7bdffd910a7dc)) - Anakin Childerhose
+- add videos to readme - ([3183eec](https://github.com/anakin4747/wksls/commit/3183eec516835b9144ac2e0e6425f36ee34cd452)) - Anakin Childerhose
+- add videos to README.md to show features - ([c1cdfd8](https://github.com/anakin4747/wksls/commit/c1cdfd8f4e317c448eaa2293a71f02a50b606840)) - Anakin Childerhose
+- remove (recommended) beside Nix - ([c2b5d2a](https://github.com/anakin4747/wksls/commit/c2b5d2aba2219987020a6ef38e4ec5c0ede3aa7b)) - Anakin Childerhose
+- use agent instead of LLM - ([0430c95](https://github.com/anakin4747/wksls/commit/0430c9558d39e5dbabfb65723663960289399916)) - Anakin Childerhose
+- remove NixOS install snippet and LSP coverage table from README - ([1ae11be](https://github.com/anakin4747/wksls/commit/1ae11bec16b8c3b11b679056ed57b6993da559ec)) - Anakin Childerhose
+- update README to reflect implemented features - ([19d8385](https://github.com/anakin4747/wksls/commit/19d838592767b58e206642401c6275e9f98bed31)) - Anakin Childerhose
+- add installation and editor configuration to README - ([5c740bd](https://github.com/anakin4747/wksls/commit/5c740bdd0c9b0687b4f5bce70fd906e36054673b)) - Anakin Childerhose
+- update agents.md and todos - ([645a380](https://github.com/anakin4747/wksls/commit/645a38089da05f5edf12d444a6149de33244af33)) - Anakin Childerhose
+- record completion context bugs and next TODOs in AGENTS.md - ([0ec27ea](https://github.com/anakin4747/wksls/commit/0ec27eaf877a723ee4249f844a91978a59a2bfd0)) - Anakin Childerhose
+- mark ftplugin TODO as done - ([cbbd46d](https://github.com/anakin4747/wksls/commit/cbbd46daa65d6b0e90190e7dcdc6272dbc0c4616)) - Anakin Childerhose
+- update README with LLM TDD intro and full LSP 3.17 coverage checklist - ([8e772e6](https://github.com/anakin4747/wksls/commit/8e772e63d63b5d2f8388cc1dfe785c378a303c01)) - Anakin Childerhose
+#### Tests
+- add failing tests for textDocument/publishDiagnostics - ([a36c678](https://github.com/anakin4747/wksls/commit/a36c678887e203037f903d42860ef5cfdfc4d990)) - Anakin Childerhose
+- replace hardcoded paths in definition fixtures with $LSTS_ROOT placeholder - ([15f52ac](https://github.com/anakin4747/wksls/commit/15f52ac7c13441630f7a6f4a83148e71cc5920af)) - Anakin Childerhose
+- move wksls plugin definition fixtures out of openembedded-core submodule - ([6756290](https://github.com/anakin4747/wksls/commit/675629069e51c09944821e8cbbf31d304c3f80d9)) - Anakin Childerhose
+- add failing tests for source plugin hover and partial keyword completion - ([14d969c](https://github.com/anakin4747/wksls/commit/14d969cdcdfce7a0ca84500f749fad88c32209bc)) - Anakin Childerhose
+- add definition tests for all 8 remaining source plugins - ([8bf9471](https://github.com/anakin4747/wksls/commit/8bf9471274fda447bc73a32e11927b7ccfb5724a)) - Anakin Childerhose
+- use lsts_definition instead of hand-rolled definition tests - ([73cc0ae](https://github.com/anakin4747/wksls/commit/73cc0ae15ac172ae8d5ffdb4dffe17ca234c05c7)) - Anakin Childerhose
+- add tests for textDocument/definition on --source plugin values - ([c7cc83b](https://github.com/anakin4747/wksls/commit/c7cc83b4d4b5ca330f11956a190c3712d18706f7)) - Anakin Childerhose
+- add failing tests for completion context bugs - ([9e2768d](https://github.com/anakin4747/wksls/commit/9e2768d358c2dc66595ac1e7f9fb0bf1c5b116b5)) - Anakin Childerhose
+- add failing tests for context-aware completion - ([54ddf65](https://github.com/anakin4747/wksls/commit/54ddf65d29057c15b90e2cfbc20e70f8a5e25ffb)) - Anakin Childerhose
+- add failing tests for completion with empty flag value - ([50c708c](https://github.com/anakin4747/wksls/commit/50c708c55030a3ce564101f3cf84bb915442d507)) - Anakin Childerhose
+- add wksls to lint target - ([43a8e07](https://github.com/anakin4747/wksls/commit/43a8e07a699f6547e342a8b4c96b6a2fb4e7bab9)) - Anakin Childerhose
+- test hover over tab-separated tokens - ([0d62a2b](https://github.com/anakin4747/wksls/commit/0d62a2bcf21c6d9c7dcfb00442b1ac4b78c465d9)) - Anakin Childerhose
+- test that initialize advertises openClose textDocumentSync - ([a54d2a8](https://github.com/anakin4747/wksls/commit/a54d2a8eb8ff2f4a50ce651c581865daff3058a5)) - Anakin Childerhose
+- add hover tests for all wks commands and options - ([03a1d1d](https://github.com/anakin4747/wksls/commit/03a1d1d33ae61773b3bf102fd2a59c59bddd152a)) - Anakin Childerhose
+- add hover response fixtures for all wks options - ([41195bf](https://github.com/anakin4747/wksls/commit/41195bf639d46256b39a33a39b8f0387d13d661d)) - Anakin Childerhose
+- add hover.wks WKS file with one token per line for hover tests - ([c59b6ee](https://github.com/anakin4747/wksls/commit/c59b6eee2f8fe2cb2ba6723abc5b6c8c4a0236da)) - Anakin Childerhose
+- add hover test and fixture for part command - ([739bac3](https://github.com/anakin4747/wksls/commit/739bac306fdc1202ed2a8fa1bda7553596de52da)) - Anakin Childerhose
+- add hover test TODOs to AGENTS.md - ([b7a25bc](https://github.com/anakin4747/wksls/commit/b7a25bc02ba1718168d3c3390c369fe783b18e7a)) - Anakin Childerhose
+- add hover test for bootloader command - ([57accdf](https://github.com/anakin4747/wksls/commit/57accdfa7d18bd5c9375ffb34b49f3b03006b4be)) - Anakin Childerhose
+- add hover fixture for bootloader command - ([87d6947](https://github.com/anakin4747/wksls/commit/87d6947c72da7d326954e81ac681b5af9c358ead)) - Anakin Childerhose
+- pass --external-sources to shellcheck to follow sourced files - ([201a1f2](https://github.com/anakin4747/wksls/commit/201a1f2980755d4a1f19086494ed12d2454a6714)) - Anakin Childerhose
+- add wksls_tests and fixtures directory - ([ce3f036](https://github.com/anakin4747/wksls/commit/ce3f036875ccd8f3f2bee4309de19ed29e648c11)) - Anakin Childerhose
+- add lsts, yocto-docs, and openembedded-core submodules - ([6211e56](https://github.com/anakin4747/wksls/commit/6211e56030e8efccbbf64c95c9056807f4c33d4f)) - Anakin Childerhose
+#### CI
+- add release.yml for creating releases - ([cbd1163](https://github.com/anakin4747/wksls/commit/cbd116397d71298d77a972e02695bf28a17dbd0c)) - Anakin Childerhose
+- use nix and run make instead of make test and make lint - ([e6a5803](https://github.com/anakin4747/wksls/commit/e6a5803a763fd1bb4f881b3bf25708b5c1f5f0e2)) - Anakin Childerhose
+- add GitHub Actions workflow - ([8d2ab96](https://github.com/anakin4747/wksls/commit/8d2ab96685b28a427eadda9b8e653eb0e40dd67f)) - anakin4747r2d2
+#### Refactoring
+- remove PATH modification in `make test` - ([e8dadc0](https://github.com/anakin4747/wksls/commit/e8dadc0d7b69f538a2c872534522520f7ab424cd)) - Anakin Childerhose
+- use guard clause to avoid nesting - ([851e195](https://github.com/anakin4747/wksls/commit/851e195777f6c29c8ba4a6bda33a11bc8412b2ee)) - Anakin Childerhose
+- merge redundant validity-guard case into _resolve_directive_flags case - ([798c4dc](https://github.com/anakin4747/wksls/commit/798c4dcbe718b91188c551eaaafa28f32291d24f)) - Anakin Childerhose
+- extract _tok_diagnostic to eliminate repeated tok/col_start/_append_diagnostic pattern - ([dc84455](https://github.com/anakin4747/wksls/commit/dc844558cdb985a2052a101c8fe9553615ae3e80)) - Anakin Childerhose
+- replace single-arm case with guard clause in _validate_line_logic - ([3343356](https://github.com/anakin4747/wksls/commit/3343356c4d79e40bd97abc8c1203cf97593aeb98)) - Anakin Childerhose
+- reword code review skill as hard rules - ([117fd17](https://github.com/anakin4747/wksls/commit/117fd17db6a6224bdbfc93febf5203fdd419a990)) - Anakin Childerhose
+- convert .agents skills to standard agentskills.io format - ([ec0530a](https://github.com/anakin4747/wksls/commit/ec0530a5f338a975617ffd06160b1c90f8398917)) - Anakin Childerhose
+- move git and code review guidance into .agents skills - ([fa1efe3](https://github.com/anakin4747/wksls/commit/fa1efe3f4653693f611e6f50e3e41acd4a87c78b)) - Anakin Childerhose
+- bump lsts and replace LSTS_RESPONSE reads with helper functions - ([97ec3e2](https://github.com/anakin4747/wksls/commit/97ec3e2d22562cbbc3bf62efd64e66c9afddfb09)) - Anakin Childerhose
+- break validate_document into focused helper functions - ([6282604](https://github.com/anakin4747/wksls/commit/628260486e7d57ea8bf715ef6dbea6ec3e0e968d)) - Anakin Childerhose
+- merge --align and --timeout into a shared integer validation case - ([9a5b218](https://github.com/anakin4747/wksls/commit/9a5b2181bb951820200441b3d84c8496cfd2211d)) - Anakin Childerhose
+- move quote_count declaration to function scope - ([c5b2ef5](https://github.com/anakin4747/wksls/commit/c5b2ef5ae7c4eb9aa35d66923af95c7af991df83)) - Anakin Childerhose
+- merge duplicate --offset size arm and collapse prev_flag cases - ([2963055](https://github.com/anakin4747/wksls/commit/29630559c362f26c6418faa79d4f7e50bb531f1c)) - Anakin Childerhose
+- move col_start declaration to validate_document function scope - ([ffd3780](https://github.com/anakin4747/wksls/commit/ffd37804a3800b82bb6f63d5ebd9587237d72218)) - Anakin Childerhose
+- extract handler functions to flatten main event loop - ([3d2a7dd](https://github.com/anakin4747/wksls/commit/3d2a7ddb6d2ca192749ad26e4b4cac7a56195757)) - Anakin Childerhose
+- extract _validate_token and _validate_enum_value to flatten validate_document - ([55f8ad4](https://github.com/anakin4747/wksls/commit/55f8ad4d3ff82e20aebdda3df95a2d88a8b46d08)) - Anakin Childerhose
+- simplify main loop and validate_document - ([a44c4c9](https://github.com/anakin4747/wksls/commit/a44c4c955fd722c71700bb93a3b64365a4ad31b9)) - Anakin Childerhose
+- diagnostics tests to use lsts_diagnostics - ([25ed730](https://github.com/anakin4747/wksls/commit/25ed730165b34af6bc3e2f203b2e5a007102bc7c)) - Anakin Childerhose
+- delete unused completion_flags fixture superseded by part_flags - ([f14b98c](https://github.com/anakin4747/wksls/commit/f14b98c75482624d9c56155ab758e74ae099f86b)) - Anakin Childerhose
+- collapse duplicate null-result sends in definition handler - ([df77b4e](https://github.com/anakin4747/wksls/commit/df77b4ec2c826f40c5c9c31c7426cbb94d3085e3)) - Anakin Childerhose
+- reorganise Vim files into standard runtime directories - ([6d57b10](https://github.com/anakin4747/wksls/commit/6d57b109493d607685027b85434206da5811ba93)) - Anakin Childerhose
+- extract send_completion, use lsts_open in didChange test - ([eb9f7e8](https://github.com/anakin4747/wksls/commit/eb9f7e844c4fae3e1a68a55c1a5816345abc544c)) - Anakin Childerhose
+#### Chores
+- add v to tag_prefix in cog.toml - ([eb8ad5e](https://github.com/anakin4747/wksls/commit/eb8ad5e7c689a8466f358f5a17223bf95816a647)) - Anakin Childerhose
+- correct cocogittos template string - ([1eb0f46](https://github.com/anakin4747/wksls/commit/1eb0f46b30e9f89e28377d7d9499e04d68f58f67)) - Anakin Childerhose
+- make local .PHONYs instead of a global one - ([fa969ce](https://github.com/anakin4747/wksls/commit/fa969cec0a7f5970c2ec94b75120de3d2a309916)) - Anakin Childerhose
+- make *-manual make targets the default (un)install targets - ([b66862f](https://github.com/anakin4747/wksls/commit/b66862f23dcb0dd4749ab7f550de200bebce59c3)) - Anakin Childerhose
+- reencode videos to fix firefox bug - ([b369189](https://github.com/anakin4747/wksls/commit/b3691893d549f9fae30d077ac0cc5c3f982bde43)) - Anakin Childerhose
+- trim 1s off of some of the videos that showed obs - ([9496790](https://github.com/anakin4747/wksls/commit/9496790fd17678304b5c7370d3f69f47d92681eb)) - Anakin Childerhose
+- replace `(dash)` with `with a dash` in tests - ([eaded30](https://github.com/anakin4747/wksls/commit/eaded302c44bf48968acd6e8ee5d583d9685dedd)) - Anakin Childerhose
+- remove href anchor around video headings - ([16e5538](https://github.com/anakin4747/wksls/commit/16e55380b181f91e95cdabab54175fdab9e70cd0)) - Anakin Childerhose
+- move undone TODOs from AGENTS.md to TODO.md - ([a764053](https://github.com/anakin4747/wksls/commit/a7640535ce3e166120c05e9db2972bb47fae1ca3)) - Anakin Childerhose
+- remove dev make target - ([b5a811c](https://github.com/anakin4747/wksls/commit/b5a811c5871192b2c9bbbafbec9d857a7084fda0)) - Anakin Childerhose
+- add cocogitto for conventional commits and changelog generation - ([ee354fa](https://github.com/anakin4747/wksls/commit/ee354fa53b1b4b8106522a075664e3950eb4e397)) - anakin4747r2d2
+- add nix-command and flakes experimental features to nix develop - ([a36bbf7](https://github.com/anakin4747/wksls/commit/a36bbf7af3c4359d60447384c48db0be48df2a3c)) - anakin4747r2d2
+- bump lsts submodule to latest commit - ([2938cae](https://github.com/anakin4747/wksls/commit/2938caec268562a1027ed439b1aafdb3336f8fb0)) - anakin4747r2d2
+- add .wks.in and .wks.inc file associations to VSCode extension - ([924782f](https://github.com/anakin4747/wksls/commit/924782fcb1431b3a24260ee073f52658ecc39489)) - Anakin Childerhose
+- open sample .wks file in nix dev shell in dev target - ([14591aa](https://github.com/anakin4747/wksls/commit/14591aad4afebb196a549c1a74796706763eab34)) - Anakin Childerhose
+- add --label bug to TODOs and remove stale notes - ([e4950b2](https://github.com/anakin4747/wksls/commit/e4950b24930293f5c9c50c905ce44b2ddfcaeb23)) - Anakin Childerhose
+- add dev target to open wksls in neovim with minimal init.lua - ([c6b4cff](https://github.com/anakin4747/wksls/commit/c6b4cff13a334ea99284c4e62821387373b3ced2)) - Anakin Childerhose
+- remove vim stuff - ([6019c56](https://github.com/anakin4747/wksls/commit/6019c5663b89c79415e46f5eb9d43fd607e8a1eb)) - Anakin Childerhose
+- bump lsts submodule to pick up lsts_diagnostics - ([0f3d726](https://github.com/anakin4747/wksls/commit/0f3d72688fe7ed9e266e3bbc5bdbbb31140acd26)) - Anakin Childerhose
+- update lsts submodule for fix missing .gitmodules - ([6d81773](https://github.com/anakin4747/wksls/commit/6d817738156653cf21156abc2f80f4a3ec690736)) - Anakin Childerhose
+- bump lsts submodule and update tests to 1-based position indexing - ([3027550](https://github.com/anakin4747/wksls/commit/3027550e183f231e95ae8ae0efdb3a9f1f06ebbd)) - Anakin Childerhose
+- bump lsts submodule and update tests to path:line:character format - ([c82fa1d](https://github.com/anakin4747/wksls/commit/c82fa1d8520928adb2918ed02d4a4cc8ead121b1)) - Anakin Childerhose
+- remove useless test - ([2de82cc](https://github.com/anakin4747/wksls/commit/2de82ccfa33a093f4fb0006016d65f72056b3bc0)) - Anakin Childerhose
+- add gitignore and fix missing publisher field in extension - ([619ab71](https://github.com/anakin4747/wksls/commit/619ab71e750aba0aee5bccb86fe4056e42db04fc)) - Anakin Childerhose
+- normalize all lsts calls to multiline backslash format - ([551eace](https://github.com/anakin4747/wksls/commit/551eaced804f1832498eecb9f62711ee1e8ef9e1)) - Anakin Childerhose
+- standardize lsts call layout in tests - ([6e32fc2](https://github.com/anakin4747/wksls/commit/6e32fc2676f87c38b9e774d64df5c34a857caae4)) - Anakin Childerhose
+- remove init.lua - ([3de2cdf](https://github.com/anakin4747/wksls/commit/3de2cdfd40aae196df4fe4565d34f03047617f47)) - Anakin Childerhose
+- mark diagnostics as blocked; document lsts_recv_notification gap - ([e587c7e](https://github.com/anakin4747/wksls/commit/e587c7e86fdd1abca254f47484f9b6e993d9f9d8)) - Anakin Childerhose
+- mark didClose and shutdown as blocked on missing lsts helpers - ([1f4fe7c](https://github.com/anakin4747/wksls/commit/1f4fe7c68541bdc174343a2dec6dc69e684da1fb)) - Anakin Childerhose
+- Vim and Neovim syntax files for .wks files - ([b4429ab](https://github.com/anakin4747/wksls/commit/b4429ab80d51cbd81f4e1d81848fe004f386ec7d)) - Anakin Childerhose
+- real openembedded-core .wks files in tests where possible - ([4f5f3ab](https://github.com/anakin4747/wksls/commit/4f5f3ab4bdb3bae56e196ae67fdc55ba97c4bf36)) - Anakin Childerhose
+- note potential lsts bugs for upstreaming - ([c6235aa](https://github.com/anakin4747/wksls/commit/c6235aa5e93a45d9f09c2337642c14e5516881d1)) - Anakin Childerhose
+- enable strict mode and guard DOC_TEXT against unbound key - ([14afbe7](https://github.com/anakin4747/wksls/commit/14afbe7949f58ca59db1d2fab1beebcf7e9e0d63)) - Anakin Childerhose
+- add install target using nix profile - ([12d60d7](https://github.com/anakin4747/wksls/commit/12d60d76d3ae2ca6d96dc796d977c9cb0c3c5853)) - Anakin Childerhose
+- clear completed hover TODO from AGENTS.md - ([6299a08](https://github.com/anakin4747/wksls/commit/6299a08a689e5a7a62045fbf8d3c87c5bd6324ae)) - Anakin Childerhose
+- revert stack trace to outermost-first order - ([1bf50f9](https://github.com/anakin4747/wksls/commit/1bf50f90066112aa090edc895099689716f1e971)) - Anakin Childerhose
+- reverse stack trace order to show innermost frame first - ([8c963a6](https://github.com/anakin4747/wksls/commit/8c963a603b4197ab1f96eea98fc171b4dc414876)) - Anakin Childerhose
+- restore red color on stack trace frames when flushing - ([b50d33f](https://github.com/anakin4747/wksls/commit/b50d33f7fa9e15742b81c695a19e67ec008eb483)) - Anakin Childerhose
+- format stack traces as path:lineno:func, drop redundant 'failed' line - ([d5805c9](https://github.com/anakin4747/wksls/commit/d5805c912b6384296ccc15506a8e405062dffbd5)) - Anakin Childerhose
+- format stack traces as aligned abspath:lineno:funcname columns - ([89cad62](https://github.com/anakin4747/wksls/commit/89cad62dc85ce9cb47a02f72efb922d4aec19ef4)) - Anakin Childerhose
+- restore function names in condensed stack trace lines - ([268aad6](https://github.com/anakin4747/wksls/commit/268aad6e79f785d9ecfb68e847fa9f5bec56ba78)) - Anakin Childerhose
+- condense stack trace lines to filepath:linenumber in formatter - ([295e98a](https://github.com/anakin4747/wksls/commit/295e98a4c860e44b9073c9a70a3191c4e7ca6ce6)) - Anakin Childerhose
+- remove nonexistent lsts file from shellcheck invocation - ([7c304bb](https://github.com/anakin4747/wksls/commit/7c304bb79035488b4ef02feca77ddcf165b1f9ce)) - Anakin Childerhose
+- attribute third-party test submodules in LICENSE - ([359e755](https://github.com/anakin4747/wksls/commit/359e755ed98ccc1f2f974c7a13dc975a38d05270)) - Anakin Childerhose
+- add bats formatter - ([221e929](https://github.com/anakin4747/wksls/commit/221e929fee59c2a4aa388d4118145411a7f5397b)) - Anakin Childerhose
+- add flake.nix with installable wksls package - ([93f9ac6](https://github.com/anakin4747/wksls/commit/93f9ac66494f50accea67d075e30cc762e101e69)) - Anakin Childerhose
+- add wksls stub script - ([140c53c](https://github.com/anakin4747/wksls/commit/140c53c9a34a4cab3ca122dc5c97e2d12abcf67a)) - Anakin Childerhose
+- add AGENTS.md - ([acd6137](https://github.com/anakin4747/wksls/commit/acd6137e2a77f93c5e8b297df97336c4fd5fd2f1)) - Anakin Childerhose
+- initial commit - ([7949509](https://github.com/anakin4747/wksls/commit/7949509e3db1946974fee8fc81c5767f5fa90f88)) - Anakin Childerhose
+
+- - -
+
+Changelog generated by [cocogitto](https://github.com/cocogitto/cocogitto).
