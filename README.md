@@ -120,7 +120,7 @@ nix profile remove wksls
 
 ### Neovim
 
-Requires Neovim 0.11+ (native LSP client with `vim.lsp.config`).
+Requires a recent Neovim build.
 
 Add the following to your `init.lua`:
 
@@ -133,6 +133,14 @@ vim.lsp.config('wksls', {
 
 vim.lsp.enable('wksls')
 ```
+
+To get `wks` filetype detection and syntax highlight make sure you are on a
+version of Neovim/Vim after my
+[contribution](https://github.com/neovim/neovim/commit/1de1c08210076edbdc23fba86d9ffff25b54cbd8)
+which added support for the `wks` filetype.
+
+Note that `wks` filetype detection is required to automatically start the
+language server in Neovim.
 
 ### VS Code / VSCodium
 
