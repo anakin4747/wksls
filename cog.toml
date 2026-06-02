@@ -18,7 +18,7 @@
 
 [changelog]
   path = "CHANGELOG.md"
-  template = "remote_commits"
+  template = "remote"
   remote = "github.com"
   repository = "wksls"
   owner = "anakin4747"
