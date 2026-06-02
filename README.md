@@ -1,9 +1,9 @@
 # wksls
 
 > **AGENTIC TDD Project** — This entire application is built using Test-Driven
-> Development to guide Ai agents through the implementation. Tests written with
+> Development to guide AI agents through the implementation. Tests written with
 > [lsts](https://github.com/anakin4747/lsts) define the expected behaviour
-> first; the agent is then directed to make them pass.
+> first then agents implement the solution.
 
 A Language Server Protocol (LSP) server for OpenEmbedded/Yocto
 [Wic Kickstart](https://docs.yoctoproject.org/ref-manual/kickstart.html)
